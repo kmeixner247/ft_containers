@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/08/26 15:24:43 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/08/27 13:37:12 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ public:
 	// Constructs a container with n elements. Each element is a copy of val.
 	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc)
 	{
-		this->_start= this->_allocator.allocate(n);
+		this->_start = this->_allocator.allocate(n);
 		this->_end = this->_start;
 		for (size_type i = 0; i < n; i++)
 		{
@@ -53,10 +53,13 @@ public:
 	}
 
 	// Range constructor
-	// template <class InputIterator>
-	// vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) 
-	// {
-	// }
+	template <class InputIterator>
+	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc)
+	{
+		this->_capacity = last - first;
+		this->_start = this->_allocator.allocate(this->_capacity);
+		std::cout << n << " from range constructor." << std::endl;
+	}
 
 	// Copy constructor
 	vector (const vector& x)
@@ -68,6 +71,7 @@ public:
 	// Destructor
 	~vector()
 	{
+		std::cout << "destructor called." << std::endl;
 		//?
 	}
 
@@ -134,7 +138,7 @@ public:
 	//returns maximum possible size of a vector
 	size_type max_size() const
 	{
-		//?
+		return (this->_allocator.max_size());
 	}
 
 	// Resizes the container so that it contains n elements.
@@ -170,6 +174,19 @@ public:
 	{
 		
 	}
+	/*
+		MODIFIER MEMBER FUNCTIONS
+	*/
+	// assign
+	// push_back
+	// pop_back
+	// insert
+	// erase
+	// swap
+	// clear
+	// emplace
+	// emplace_back
+	
 private:
 	pointer			_start;
 	pointer 		_end;
@@ -180,3 +197,4 @@ private:
 
 }	//end of namespace
 #endif
+

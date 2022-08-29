@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/08/26 15:28:15 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/08/27 13:35:32 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,4 +31,9 @@ int main()
 	std::cout << (testvector2.begin() == testvector2.end()) << std::endl;
 	std::cout << (testvector2.begin() != testvector2.begin()) << std::endl;
 	std::cout << (testvector2.begin() != testvector2.end()) << std::endl;
+	std::cout << OG1.max_size() << std::endl;
+	std::cout << OG2.max_size() << std::endl;
+	std::cout << testvector.max_size() << std::endl;
+	std::cout << testvector2.max_size() << std::endl;
+	ft::vector<char> abcdef(testvector2.begin(), testvector2.end());
 }
