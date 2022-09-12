@@ -6,13 +6,14 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 22:24:20 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/08/26 15:15:40 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/11 18:00:02 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_RANDOM_ACCESS_ITERATOR_HPP
 #define FT_RANDOM_ACCESS_ITERATOR_HPP
 #include "ft_iterator.hpp"
+#include <iterator>
 namespace ft
 {
 template<typename T>
@@ -25,7 +26,7 @@ typedef typename ft::iterator<random_access_iterator_tag, T>::reference referenc
 typedef typename ft::iterator<random_access_iterator_tag, T>::iterator_category iterator_category;
 
 public:
-	random_access_iterator() : _current(nullptr) {}
+	random_access_iterator() : _current(0) {}
 	random_access_iterator(random_access_iterator const &rhs) : _current(rhs._current) {}
 	random_access_iterator(pointer p) : _current(p) {}
 	random_access_iterator<T> &operator=(random_access_iterator<T> const &rhs)
