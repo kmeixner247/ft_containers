@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/12 22:26:24 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/13 00:40:57 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,6 +281,39 @@ public:
 		this->_size += n;
 	}
 	// insert range
+	template <class InputIterator>
+    void insert (iterator position, InputIterator first, InputIterator last)
+	{
+		pointer temp;
+		size_type n = last - first;
+		size_type distance = position - this->begin();
+		if (this->_size + n > this->_capacity * 2)
+			this->reserve(this->_capacity + n);
+		else if (this->_size + n > this->_capacity)
+			this->reserve(this->_capacity * 2);
+		if (distance < this->_size)
+		{
+			temp = this->_end + n - 1;
+			this->_end += n;
+			// while (this->_start + n != temp)
+			for (size_type i = 0; (this->_start + distance + i) < this->_end; i++)
+			{
+				this->_allocator.construct(temp, *(temp - n));
+				this->_allocator.destroy(temp - n);
+				temp--;
+			}
+			for (size_type i = 0; i < n; i++)
+			{
+				this->_allocator.construct(this->_start + distance + i, *(first + i));
+			}
+			this->_size += n;
+		}
+		else
+		{
+			for (; first != last; first++)
+				this->insert(this->end(), *first);
+		}
+	}
 	// erase
 	// swap
 	// clear

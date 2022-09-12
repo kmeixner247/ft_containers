@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/12 22:27:42 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/13 00:41:34 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,9 @@ int main()
 	for (int i = 0; one.begin() + i != one.end(); i++)
 		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
 	
-	one.insert(one.end(), 12, 2);
+	// one.insert(one.end(), 12, 2);
+	ft::vector<int> two(9, 9);
+	one.insert(one.begin() + 5, two.begin(), two.end());
 	std::cout << one.capacity() << " " << one.size() << std::endl;
 	for (int i = 0; one.begin() + i != one.end(); i++)
 		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
