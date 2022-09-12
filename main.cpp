@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/12 12:48:10 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/12 22:27:42 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,18 @@ int main()
 	// ft::vector<char> abcdef(testvector2.begin(), testvector2.end());
 	// for (int i = 0; abcdef.begin() + i != abcdef.end(); i++)
 	// 	std::cout << "i: " << i << " content: " << *(abcdef.begin() + i) << std::endl;
-	ft::vector<int> one(9, 1);
-	one.reserve(10);
-	for (int i = 0; one.begin() + i != one.end(); i++)
-		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
-	
-	std::cout << &*(one.insert(one.end(), 5)) << std::endl;
+	ft::vector<int> one(5, 1);
+	// one.reserve(10);
 	std::cout << one.capacity() << " " << one.size() << std::endl;
 	for (int i = 0; one.begin() + i != one.end(); i++)
 		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
 	
+	one.insert(one.end(), 12, 2);
+	std::cout << one.capacity() << " " << one.size() << std::endl;
+	for (int i = 0; one.begin() + i != one.end(); i++)
+		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
+	
+	std::cout << one.capacity() << " " << one.size() << std::endl;
 	// std::vector<int> two;
 	// one.reserve(one.max_size() + 1);
 }

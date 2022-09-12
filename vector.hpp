@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/12 12:59:53 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/12 22:26:24 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,43 +237,49 @@ public:
 				temp--;
 			}
 			this->_allocator.construct(temp, val);
+			this->_size++;
 			return (this->begin() + distance);
 		}
 		else
 		{
 			this->_allocator.construct(&*position, val);
+			this->_size++;
 			this->_end++;
 			return (position);
 		}
 	}
 	// insert fill
-	// void insert (iterator position, size_type n, const value_type& val)
-	// {
-	// 	pointer temp;
-	// 	size_type distance = position - this->begin();
-		
-	// 	if (this->_size + n > this->_capacity)
-	// 		this->reserve(this->_capacity * 2);
-	// 	if (position < this->_end)
-	// 	{
-	// 		temp = this->_end;
-	// 		this->_end++;
-	// 		while (this->_start + distance != temp)
-	// 		{
-	// 			this->_allocator.construct(temp, *(temp - 1));
-	// 			this->_allocator.destroy(temp - 1);
-	// 			temp--;
-	// 		}
-	// 		this->_allocator.construct(temp, val);
-	// 		return (this->begin() + distance);
-	// 	}
-	// 	else
-	// 	{
-	// 		this->_allocator.construct(&*position, val);
-	// 		this->_end++;
-	// 		return (position);
-	// 	}
-	// }
+	void insert (iterator position, size_type n, const value_type& val)
+	{
+		pointer temp;
+		size_type distance = position - this->begin();
+		if (this->_size + n > this->_capacity * 2)
+			this->reserve(this->_capacity + n);
+		else if (this->_size + n > this->_capacity)
+			this->reserve(this->_capacity * 2);
+		if (distance < this->_size)
+		{
+			temp = this->_end + n - 1;
+			this->_end += n;
+			while (this->_start + distance != temp)
+			{
+				this->_allocator.construct(temp, *(temp - n));
+				this->_allocator.destroy(temp - n);
+				temp--;
+			}
+			for (size_type i = 0; i < n; i++)
+				this->_allocator.construct(temp + i, val);
+		}
+		else
+		{
+			for (size_type i = 0; i < n; i++)
+			{
+				this->_allocator.construct(this->_start + distance + i, val);
+				this->_end++;
+			}
+		}
+		this->_size += n;
+	}
 	// insert range
 	// erase
 	// swap
