@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/13 00:40:57 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/13 21:11:02 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,13 @@ class vector {
 public:
 
 	// Empty container constructor / default constructor
-	explicit vector(const allocator_type &alloc = allocator_type()) :_start(0), _end(0), _size(0), _allocator(alloc)
+	explicit vector(const allocator_type &alloc = allocator_type()) :_start(0), _end(0), _allocator(alloc)
 	{
 	}
 	
 	// Fill constructor
 	// Constructs a container with n elements. Each element is a copy of val.
-	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _size(n), _capacity(n), _allocator(alloc)
+	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _capacity(n), _allocator(alloc)
 	{
 		this->_start = this->_allocator.allocate(n);
 		this->_end = this->_start;
@@ -55,7 +55,6 @@ public:
 	typename enable_if<!is_integral<InputIterator>::value>::type* = 0) : _allocator(alloc)
 	{
 		this->_capacity = last - first;
-		this->_size = last - first;
 		this->_start = this->_allocator.allocate(this->_capacity);
 		this->_end = this->_start;
 		while (first != last)
@@ -63,10 +62,9 @@ public:
 	}
 
 	// Copy constructor
-	vector (const vector& x)
+	vector (const vector& x) : _start(0), _end(0), _capacity(0)
 	{
-		(void) x;
-		//?
+		this->insert(this->begin(), x.begin(), x.end()); //gonna need const iterators for this
 	}
 
 	// Destructor
@@ -142,7 +140,7 @@ public:
 	// Returns size of the vector
 	size_type size() const
 	{
-		return (this->_size);
+		return (this->_end - this->_start);
 	}
 
 	//returns maximum possible size of a vector
@@ -159,14 +157,12 @@ public:
 	void resize (size_type n, value_type val = value_type())
 	{
 		if (n > this->_capacity)
-		{
-			
-		}
-		if (n < this->_size)
-			while (this->_size-- > n)
+			this->reserve(n);
+		if (n < this->size())
+			for (size_type i = this->size(); i > n; i--)
 				this->_allocator.destroy((this->_end--) - 1);
-		if (n > this->_size)
-			while (this->_size++ < n)
+		if (n > this->size())
+			for (size_type i = this->size(); i < n; i++)
 				this->_allocator.construct(this->_end++, val);
 		//?
 	}
@@ -180,7 +176,7 @@ public:
 	// Checks if vector is empty (size 0), returns true if empty, false if not
 	bool empty() const
 	{
-		return (!(this->_size));
+		return (!(this->size()));
 	}
 
 	// If n > capacity, capacity is increased to n, otherwise does nothing
@@ -201,8 +197,7 @@ public:
 				this->_allocator.destroy(tempstart);
 				tempstart++;
 			}	
-			this->_allocator.deallocate(tempstart - this->_size, this->_capacity);
-			this->_size = this->_end - this->_start;
+			this->_allocator.deallocate(tempstart - this->size(), this->_capacity);
 			this->_capacity = n;
 		}
 	}
@@ -216,15 +211,35 @@ public:
 		MODIFIER MEMBER FUNCTIONS
 	*/
 	// assign
+	template <class InputIterator>
+  	void assign (InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value>::type* = 0)
+	{
+		this->clear();
+		this->insert(this->_start, first, last);
+	}
+
+	void assign (size_type n, const value_type& val)
+	{
+		this->clear();
+		this->insert(this->_start, n, val);
+	}
 	// push_back
+	void push_back (const value_type& val)
+	{
+		this->insert(this->_end, val);
+	}
 	// pop_back
+	void pop_back()
+	{
+		this->erase(this->end() - 1);
+	}
 	// insert single
 	iterator insert (iterator position, const value_type& val)
 	{
 		pointer temp;
 		size_type distance = position - this->begin();
 		
-		if (this->_size == this->_capacity)
+		if (this->size() == this->_capacity)
 			this->reserve(this->_capacity * 2);
 		if (position < this->_end)
 		{
@@ -237,13 +252,11 @@ public:
 				temp--;
 			}
 			this->_allocator.construct(temp, val);
-			this->_size++;
 			return (this->begin() + distance);
 		}
 		else
 		{
 			this->_allocator.construct(&*position, val);
-			this->_size++;
 			this->_end++;
 			return (position);
 		}
@@ -253,11 +266,11 @@ public:
 	{
 		pointer temp;
 		size_type distance = position - this->begin();
-		if (this->_size + n > this->_capacity * 2)
-			this->reserve(this->_capacity + n);
-		else if (this->_size + n > this->_capacity)
+		if (this->size() + n > this->_capacity * 2)
+			this->reserve(this->size() + n);
+		else if (this->size() + n > this->_capacity)
 			this->reserve(this->_capacity * 2);
-		if (distance < this->_size)
+		if (distance < this->size())
 		{
 			temp = this->_end + n - 1;
 			this->_end += n;
@@ -278,7 +291,6 @@ public:
 				this->_end++;
 			}
 		}
-		this->_size += n;
 	}
 	// insert range
 	template <class InputIterator>
@@ -287,15 +299,14 @@ public:
 		pointer temp;
 		size_type n = last - first;
 		size_type distance = position - this->begin();
-		if (this->_size + n > this->_capacity * 2)
-			this->reserve(this->_capacity + n);
-		else if (this->_size + n > this->_capacity)
+		if (this->size() + n > this->_capacity * 2)
+			this->reserve(this->size() + n);
+		else if (this->size() + n > this->_capacity)
 			this->reserve(this->_capacity * 2);
-		if (distance < this->_size)
+		if (distance < this->size())
 		{
 			temp = this->_end + n - 1;
 			this->_end += n;
-			// while (this->_start + n != temp)
 			for (size_type i = 0; (this->_start + distance + i) < this->_end; i++)
 			{
 				this->_allocator.construct(temp, *(temp - n));
@@ -306,7 +317,6 @@ public:
 			{
 				this->_allocator.construct(this->_start + distance + i, *(first + i));
 			}
-			this->_size += n;
 		}
 		else
 		{
@@ -315,22 +325,55 @@ public:
 		}
 	}
 	// erase
+	iterator erase (iterator position)
+	{
+		pointer p = &*position;
+		if (this->size() == 1)
+			this->_allocator.destroy(p);
+		else
+		{
+			while (p + 1 != this->_end)
+			{
+				this->_allocator.construct(p, *(p + 1));
+				this->_allocator.destroy(p + 1);
+				p++;
+			}
+		}	
+		this->_end--;
+		return (0);
+	}
+
+	iterator erase (iterator first, iterator last)
+	{
+		pointer pfirst = &*first;
+		pointer plast = &*last;
+		size_type distance = last - first;
+		plast--;
+		while (plast-- != pfirst)
+		{
+			this->_allocator.destroy(plast);
+		}
+		while (pfirst + distance < this->_end)
+		{
+			this->_allocator.construct(pfirst, *(pfirst + distance));
+			this->_allocator.destroy(pfirst + distance);
+			pfirst++;
+		}
+		this->_end -= distance;
+		return (first);
+	}
 	// swap
 	// clear
 	void clear()
 	{
-		this->_end--;
-		while (this->_start && this->_end != this->_start)
-			this->_allocator.destroy(this->_end--);
-		this->_allocator.destroy(this->_start);
+		for (size_type i = 0; i < this->size(); i++)
+			this->_allocator.destroy(this->_start + i);
+		this->_end = this->_start;
 	}
-	// emplace
-	// emplace_back
 	
 private:
 	pointer			_start;
 	pointer 		_end;
-	size_type		_size;
 	size_type		_capacity;
 	allocator_type	_allocator;
 };
