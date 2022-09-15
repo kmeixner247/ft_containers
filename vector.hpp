@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/13 21:11:02 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/15 15:54:53 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ namespace ft
 {
 template <typename T, typename Alloc = std::allocator<T> >
 class vector {
+public:
 	typedef T value_type;
 	typedef Alloc allocator_type;
 	typedef typename allocator_type::reference reference;
@@ -27,12 +28,11 @@ class vector {
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
 	typedef typename ft::random_access_iterator<T> iterator;	//convertible to const?
-	// typedef typename ft::random_access_iterator<const T> const_iterator;	//?
+	typedef typename ft::constant_random_access_iterator<const T> const_iterator;	//?
 	// typedef typename ft::reverse_iterator<iterator> reverse_iterator		//?
 	// typedef typename ft::reverse_iterator<const_iterator> const_reverse_iterator		//?
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
-public:
 
 	// Empty container constructor / default constructor
 	explicit vector(const allocator_type &alloc = allocator_type()) :_start(0), _end(0), _allocator(alloc)
@@ -64,7 +64,7 @@ public:
 	// Copy constructor
 	vector (const vector& x) : _start(0), _end(0), _capacity(0)
 	{
-		this->insert(this->begin(), x.begin(), x.end()); //gonna need const iterators for this
+		this->insert(this->begin(), x.cbegin(), x.cend()); //gonna need const iterators for this
 	}
 
 	// Destructor
@@ -104,19 +104,19 @@ public:
 		return (temp);
 	}
 
-	iterator rend()		//change
+	iterator rend() 	//change
 	{
 		iterator temp(this->_end);
 		return (temp);
 	}
 	
-	iterator cbegin()	//change
+	iterator cbegin() const	//change
 	{
 		iterator temp(this->_start);
 		return (temp);
 	}
 
-	iterator cend()		//change
+	iterator cend() const	//change
 	{
 		iterator temp(this->_end);
 		return (temp);
@@ -363,6 +363,10 @@ public:
 		return (first);
 	}
 	// swap
+	void swap (vector& x)
+	{
+		(void)x;
+	}
 	// clear
 	void clear()
 	{

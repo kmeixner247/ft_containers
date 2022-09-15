@@ -6,13 +6,16 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/11 16:06:12 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/11 19:32:21 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/15 15:52:31 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+
+namespace ft
+{
 template<bool, class T = void>
 struct enable_if {};
 
@@ -52,4 +55,7 @@ template <> struct is_integral<unsigned short int> : true_type {};
 template <> struct is_integral<unsigned int> : true_type {};
 template <> struct is_integral<unsigned long int> : true_type {};
 template <> struct is_integral<unsigned long long int> : true_type {};
+
+
+}		//namespace end
 #endif

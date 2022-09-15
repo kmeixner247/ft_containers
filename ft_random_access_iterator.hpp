@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 22:24:20 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/11 18:00:02 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/15 15:40:21 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,17 +56,17 @@ public:
 		this->_current--;
 		return(temp);
 	}
-	random_access_iterator<T> operator+(difference_type n)	//size_type?
+	random_access_iterator<T> operator+(difference_type n)
 	{
 		return (this->_current + n);
 	}
 	
-	random_access_iterator<T> operator-(difference_type n)	//size_type?
+	random_access_iterator<T> operator-(difference_type n)
 	{
 		return (this->_current - n);
 	}
 	
-	difference_type operator-(random_access_iterator<T> rhs)	//size_type?
+	difference_type operator-(random_access_iterator<T> rhs)
 	{
 		return (this->_current - rhs._current);
 	}
@@ -97,6 +97,102 @@ public:
 	}
 	
 	bool operator!=(random_access_iterator<T> rhs)
+	{
+		return (this->_current != rhs._current);
+	}
+
+	
+	
+	T &operator*()
+	{
+		return (*(this->_current));
+	}
+	
+private:
+	pointer _current;
+};
+
+template<typename T>
+class constant_random_access_iterator : public iterator<random_access_iterator_tag, T>
+{
+typedef typename ft::iterator<random_access_iterator_tag, T>::difference_type difference_type;
+typedef const typename ft::iterator<random_access_iterator_tag, T>::value_type value_type;
+typedef typename ft::iterator<random_access_iterator_tag, T>::pointer pointer;
+typedef typename ft::iterator<random_access_iterator_tag, T>::reference reference;
+typedef typename ft::iterator<random_access_iterator_tag, T>::iterator_category iterator_category;
+
+public:
+	constant_random_access_iterator() : _current(0) {}
+	constant_random_access_iterator(constant_random_access_iterator const &rhs) : _current(rhs._current) {}
+	constant_random_access_iterator(pointer p) : _current(p) {}
+	constant_random_access_iterator<T> &operator=(constant_random_access_iterator<T> const &rhs)
+	{
+		this->_current = rhs->_current;
+		return (*this);
+	}
+	constant_random_access_iterator<T> &operator++()
+	{
+		this->_current++;
+		return (*this);
+	}
+	constant_random_access_iterator<T> operator++(int)
+	{
+		constant_random_access_iterator<T> temp(*this);
+		this->_current++;
+		return(temp);
+	}
+	constant_random_access_iterator<T> &operator--()
+	{
+		this->_current--;
+		return (*this);
+	}
+	constant_random_access_iterator<T> operator--(int)
+	{
+		constant_random_access_iterator<T> temp(*this);
+		this->_current--;
+		return(temp);
+	}
+	constant_random_access_iterator<T> operator+(difference_type n)
+	{
+		return (this->_current + n);
+	}
+	
+	constant_random_access_iterator<T> operator-(difference_type n)
+	{
+		return (this->_current - n);
+	}
+	
+	difference_type operator-(const constant_random_access_iterator<T> rhs)
+	{
+		return (this->_current - rhs._current);
+	}
+
+	bool operator<(const constant_random_access_iterator<T> rhs)
+	{
+		return (this->_current < rhs._current);
+	}
+
+	bool operator>(const constant_random_access_iterator<T> rhs)
+	{
+		return (this->_current > rhs._current);
+	}
+
+	bool operator<=(const constant_random_access_iterator<T> rhs)
+	{
+		return (this->_current <= rhs._current);
+	}
+	
+	bool operator>=(const constant_random_access_iterator<T> rhs)
+	{
+		return (this->_current >= rhs._current);
+	}
+	
+	bool operator==(const constant_random_access_iterator<T> rhs)
+	{
+		return (this->_current == rhs._current);
+	}
+	
+	bool operator!=(const constant_random_access_iterator<T> rhs)
 	{
 		return (this->_current != rhs._current);
 	}
