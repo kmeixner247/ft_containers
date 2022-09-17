@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/13 21:06:37 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/17 20:03:59 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,32 @@ int main()
 		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
 	}
 	std::cout << "capacity: " << one.capacity() << " size: " << one.size() << std::endl;
-	std::cout << "???" << std::endl;
+	std::cout << (one == two) << std::endl;
+	ft::vector<int> three(one);
+	std::cout << (one == three) << std::endl;
+	std::string s = "approvjvorppa";
+	std::cout << (ft::equal(s.begin(), s.begin() + s.size()/2, s.rbegin())) << std::endl;
+	
+    std::vector<int> result, result_2;
+	ft::vector<int> V_int1, V_int2, V_int3;
+	ft::vector<std::string> V_str1, V_str2, V_str3;
+	V_int3.push_back(1);
+	V_str1.push_back("aa");
+	V_str2.push_back("ab");
+	std::cout <<  "should be true: " << std::boolalpha << (V_int1 == V_int2) << std::endl;
+	V_int1.push_back(1);
+	std::cout <<  "should be false: " << std::boolalpha << (V_int1 == V_int2) << std::endl;
+	V_int2.push_back(2);
+	std::cout <<  "should be false: " << std::boolalpha << (V_int1 == V_int2) << std::endl;
+	std::cout <<  "should be true: " << std::boolalpha << (V_int1 == V_int3) << std::endl;
+	result_2.push_back(V_int1 == V_int3);
+	result_2.push_back(V_str1 == V_str2);
+	V_str3 = V_str2;
+	std::cout <<  "should be false: " << std::boolalpha << (V_str1 == V_str2) << std::endl;
+	std::cout <<  "should be true: " << std::boolalpha << (V_str2 == V_str3) << std::endl;
+	std::cout << V_int1.at(0) << std::endl;
+	// for (size_t i = 0; result_2.begin() + i != result_2.end(); i++)
+	// 	std::cout <<"x: "<< result_2.at(i) << std::endl;
 	// std::vector<int> two;
 	// one.reserve(one.max_size() + 1);
 

@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/15 15:54:53 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/17 20:04:32 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define RANDOMTESTS_HPP
 #include <memory>
 #include <iostream>
+#include <stdexcept>
 #include "ft_random_access_iterator.hpp"
 #include "utils.hpp"
 namespace ft
@@ -64,7 +65,7 @@ public:
 	// Copy constructor
 	vector (const vector& x) : _start(0), _end(0), _capacity(0)
 	{
-		this->insert(this->begin(), x.cbegin(), x.cend()); //gonna need const iterators for this
+		this->insert(this->begin(), x.begin(), x.end()); //gonna need const iterators for this
 	}
 
 	// Destructor
@@ -79,7 +80,8 @@ public:
 		if (*this == x)
 			return (*this);
 		this->clear();
-		this->_allocator.deallocate(this->_start, this->_capacity);		//do more stuff, for real mate
+		// this->_allocator.deallocate(this->_start, this->_capacity);		//do more stuff, for real mate
+		this->insert(this->begin(), x.begin(), x.end());
 		return (*this);
 	}
 
@@ -110,27 +112,27 @@ public:
 		return (temp);
 	}
 	
-	iterator cbegin() const	//change
+	const_iterator begin() const	//change
 	{
-		iterator temp(this->_start);
+		const_iterator temp(this->_start);
 		return (temp);
 	}
 
-	iterator cend() const	//change
+	const_iterator end() const	//change
 	{
-		iterator temp(this->_end);
+		const_iterator temp(this->_end);
 		return (temp);
 	}
 	
-	iterator crbegin()	//change
+	const_iterator rbegin() const	//change
 	{
-		iterator temp(this->_start);
+		const_iterator temp(this->_start);
 		return (temp);
 	}
 
-	iterator crend()		//change
+	const_iterator rend() const		//change
 	{
-		iterator temp(this->_end);
+		const_iterator temp(this->_end); 
 		return (temp);
 	}
 	/* 
@@ -208,6 +210,32 @@ public:
 		
 	}
 	/*
+		ELEMENT ACCESS
+	*/
+
+	reference operator[] (size_type n)
+	{
+		return (*(this->_start + n));
+	}
+	const_reference operator[] (size_type n) const
+	{
+		return (*(this->_start + n));
+	}
+	
+	reference at (size_type n)
+	{
+		if (n >= this->size())
+			throw std::out_of_range("index out of range");
+		return (*(this->_start + n));
+	}
+	
+	const_reference at (size_type n) const
+	{
+		if (n >= this->size())
+			throw std::out_of_range("index out of range");
+		return (*(this->_start + n));
+	}
+	/*
 		MODIFIER MEMBER FUNCTIONS
 	*/
 	// assign
@@ -238,8 +266,9 @@ public:
 	{
 		pointer temp;
 		size_type distance = position - this->begin();
-		
-		if (this->size() == this->_capacity)
+		if (this->_capacity == 0)
+			this->reserve(1);
+		else if (this->size() == this->_capacity)
 			this->reserve(this->_capacity * 2);
 		if (position < this->_end)
 		{
@@ -313,10 +342,9 @@ public:
 				this->_allocator.destroy(temp - n);
 				temp--;
 			}
-			for (size_type i = 0; i < n; i++)
-			{
-				this->_allocator.construct(this->_start + distance + i, *(first + i));
-			}
+			for (temp = this->_start; first != last; temp++)
+				this->insert(this->end(), *(first++));
+
 		}
 		else
 		{
@@ -362,11 +390,13 @@ public:
 		this->_end -= distance;
 		return (first);
 	}
+	
 	// swap
 	void swap (vector& x)
 	{
 		(void)x;
 	}
+	
 	// clear
 	void clear()
 	{
@@ -381,6 +411,44 @@ private:
 	size_type		_capacity;
 	allocator_type	_allocator;
 };
+template <class T, class Alloc>
+bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return (false);
+	else
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+
+template <class T, class Alloc>
+bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (!(lhs == rhs));
+}
+
+template <class T, class Alloc>
+bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+}
+
+template <class T, class Alloc>
+bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (!(rhs < lhs));
+}
+
+template <class T, class Alloc>
+bool operator> (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (rhs < lhs);
+}
+
+template <class T, class Alloc>
+bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (!(lhs < rhs));
+}
 
 }	//end of namespace
 #endif

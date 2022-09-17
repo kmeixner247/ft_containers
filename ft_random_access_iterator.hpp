@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 22:24:20 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/15 15:40:21 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/17 19:47:46 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@ namespace ft
 template<typename T>
 class random_access_iterator : public iterator<random_access_iterator_tag, T>
 {
+public:
 typedef typename ft::iterator<random_access_iterator_tag, T>::difference_type difference_type;
 typedef typename ft::iterator<random_access_iterator_tag, T>::value_type value_type;
 typedef typename ft::iterator<random_access_iterator_tag, T>::pointer pointer;
 typedef typename ft::iterator<random_access_iterator_tag, T>::reference reference;
 typedef typename ft::iterator<random_access_iterator_tag, T>::iterator_category iterator_category;
 
-public:
 	random_access_iterator() : _current(0) {}
 	random_access_iterator(random_access_iterator const &rhs) : _current(rhs._current) {}
 	random_access_iterator(pointer p) : _current(p) {}
@@ -207,6 +207,18 @@ public:
 private:
 	pointer _current;
 };
+
+template<typename T>
+random_access_iterator<T> operator+ (typename ft::iterator<random_access_iterator_tag, T>::difference_type n, random_access_iterator<T> &it)
+{
+	return (&(*it) + n);
+}
+
+template<typename T>
+random_access_iterator<T> operator- (typename ft::iterator<random_access_iterator_tag, T>::difference_type n, random_access_iterator<T> &it)
+{
+	return (&(*it) - n);
+}
 
 } //end of namespace
 #endif
