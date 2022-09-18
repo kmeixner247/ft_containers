@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/17 20:03:59 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/18 11:47:47 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int main()
 	ft::vector<int> one(zero);
 	std::cout << "capacity: " << one.capacity() << " size: " << one.size() << std::endl;
 	for (int i = 0; one.begin() + i != one.end(); i++)
-		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
+		std::cout << "1: i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
 	
 	// one.insert(one.end(), 12, 2);
 	ft::vector<int> two(33, 19);
@@ -94,5 +94,13 @@ int main()
 	// 	std::cout <<"x: "<< result_2.at(i) << std::endl;
 	// std::vector<int> two;
 	// one.reserve(one.max_size() + 1);
-
+	ft::vector<int> pls;
+	// pls.push_back(1);
+	pls.insert(pls.end(), 5, 5);
+	std::cout << pls[0] << std::endl;
+	std::cout << pls[1] << std::endl;
+	std::cout << pls[2] << std::endl;
+	std::cout << pls[3] << std::endl;
+	std::cout << pls[4] << std::endl;
+	std::cout << pls.capacity() << " " << pls.size() << std::endl;
 }

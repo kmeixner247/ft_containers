@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 22:24:20 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/17 19:47:46 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/17 23:35:06 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,13 @@ typedef typename ft::iterator<random_access_iterator_tag, T>::iterator_category 
 	random_access_iterator() : _current(0) {}
 	random_access_iterator(random_access_iterator const &rhs) : _current(rhs._current) {}
 	random_access_iterator(pointer p) : _current(p) {}
+	pointer base()
+	{
+		return (this->_current);
+	}
 	random_access_iterator<T> &operator=(random_access_iterator<T> const &rhs)
 	{
-		this->_current = rhs->_current;
+		this->_current = rhs._current;
 		return (*this);
 	}
 	random_access_iterator<T> &operator++()
@@ -101,7 +105,17 @@ typedef typename ft::iterator<random_access_iterator_tag, T>::iterator_category 
 		return (this->_current != rhs._current);
 	}
 
+	random_access_iterator &operator+=(difference_type n)
+	{
+		this->_current += n;
+		return (*this);
+	}
 	
+	random_access_iterator &operator-=(difference_type n)
+	{
+		this->_current -= n;
+		return (*this);
+	}
 	
 	T &operator*()
 	{
@@ -125,6 +139,10 @@ public:
 	constant_random_access_iterator() : _current(0) {}
 	constant_random_access_iterator(constant_random_access_iterator const &rhs) : _current(rhs._current) {}
 	constant_random_access_iterator(pointer p) : _current(p) {}
+	pointer base()
+	{
+		return (this->_current);
+	}
 	constant_random_access_iterator<T> &operator=(constant_random_access_iterator<T> const &rhs)
 	{
 		this->_current = rhs->_current;
@@ -196,14 +214,26 @@ public:
 	{
 		return (this->_current != rhs._current);
 	}
-
 	
+	constant_random_access_iterator &operator+=(difference_type n)
+	{
+		this->_current += n;
+		return (*this);
+	}
+	
+	constant_random_access_iterator &operator-=(difference_type n)
+	{
+		this->_current -= n;
+		return (*this);
+	}
 	
 	T &operator*()
 	{
 		return (*(this->_current));
 	}
 	
+	
+
 private:
 	pointer _current;
 };

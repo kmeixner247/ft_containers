@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/17 20:04:32 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/18 12:21:17 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public:
 	typedef size_t size_type;
 
 	// Empty container constructor / default constructor
-	explicit vector(const allocator_type &alloc = allocator_type()) :_start(0), _end(0), _allocator(alloc)
+	explicit vector(const allocator_type &alloc = allocator_type()) :_start(0), _end(0), _capacity(0), _allocator(alloc)
 	{
 	}
 	
@@ -63,9 +63,11 @@ public:
 	}
 
 	// Copy constructor
-	vector (const vector& x) : _start(0), _end(0), _capacity(0)
+	vector (const vector& x) : _start(0), _end(0), _capacity(x.capacity())
 	{
-		this->insert(this->begin(), x.begin(), x.end()); //gonna need const iterators for this
+		this->_start = this->_allocator.allocate(this->_capacity);
+		this->_end = this->_start;
+		this->insert(this->_end, x.begin(), x.end());
 	}
 
 	// Destructor
@@ -81,7 +83,7 @@ public:
 			return (*this);
 		this->clear();
 		// this->_allocator.deallocate(this->_start, this->_capacity);		//do more stuff, for real mate
-		this->insert(this->begin(), x.begin(), x.end());
+		this->insert(this->_end, x.begin(), x.end());
 		return (*this);
 	}
 
@@ -228,12 +230,41 @@ public:
 			throw std::out_of_range("index out of range");
 		return (*(this->_start + n));
 	}
-	
 	const_reference at (size_type n) const
 	{
 		if (n >= this->size())
 			throw std::out_of_range("index out of range");
 		return (*(this->_start + n));
+	}
+
+	reference front()
+	{
+		return (*this->_start);
+	}
+	
+	const_reference front() const
+	{
+		return (*this->_start);
+	}
+
+	reference back()
+	{
+		return (*(this->_end - 1));
+	}
+	
+	const_reference back() const
+	{
+		return (*(this->_end - 1));
+	}
+
+	value_type* data() 
+	{
+		return (this->_start);
+	}
+
+	const value_type* data() const
+	{
+		return (this->_start);
 	}
 	/*
 		MODIFIER MEMBER FUNCTIONS
@@ -243,13 +274,13 @@ public:
   	void assign (InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value>::type* = 0)
 	{
 		this->clear();
-		this->insert(this->_start, first, last);
+		this->insert(this->_end, first, last);
 	}
 
 	void assign (size_type n, const value_type& val)
 	{
 		this->clear();
-		this->insert(this->_start, n, val);
+		this->insert(this->_end, n, val);
 	}
 	// push_back
 	void push_back (const value_type& val)
@@ -262,119 +293,74 @@ public:
 		this->erase(this->end() - 1);
 	}
 	// insert single
+
 	iterator insert (iterator position, const value_type& val)
 	{
-		pointer temp;
-		size_type distance = position - this->begin();
-		if (this->_capacity == 0)
-			this->reserve(1);
-		else if (this->size() == this->_capacity)
-			this->reserve(this->_capacity * 2);
-		if (position < this->_end)
-		{
-			temp = this->_end;
-			this->_end++;
-			while (this->_start + distance != temp)
-			{
-				this->_allocator.construct(temp, *(temp - 1));
-				this->_allocator.destroy(temp - 1);
-				temp--;
-			}
-			this->_allocator.construct(temp, val);
-			return (this->begin() + distance);
-		}
-		else
-		{
-			this->_allocator.construct(&*position, val);
-			this->_end++;
-			return (position);
-		}
+		this->insert(position, 1, val);
+		return (position);
 	}
+
 	// insert fill
 	void insert (iterator position, size_type n, const value_type& val)
 	{
-		pointer temp;
-		size_type distance = position - this->begin();
-		if (this->size() + n > this->_capacity * 2)
-			this->reserve(this->size() + n);
-		else if (this->size() + n > this->_capacity)
-			this->reserve(this->_capacity * 2);
-		if (distance < this->size())
-		{
-			temp = this->_end + n - 1;
-			this->_end += n;
-			while (this->_start + distance != temp)
-			{
-				this->_allocator.construct(temp, *(temp - n));
-				this->_allocator.destroy(temp - n);
-				temp--;
-			}
-			for (size_type i = 0; i < n; i++)
-				this->_allocator.construct(temp + i, val);
-		}
-		else
-		{
-			for (size_type i = 0; i < n; i++)
-			{
-				this->_allocator.construct(this->_start + distance + i, val);
-				this->_end++;
-			}
-		}
+		ft::vector<T> temp(n, val);
+		this->insert(position, temp.begin(), temp.end());
 	}
+
 	// insert range
 	template <class InputIterator>
-    void insert (iterator position, InputIterator first, InputIterator last)
+	void insert (iterator position, InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value>::type* = 0)
 	{
-		pointer temp;
 		size_type n = last - first;
 		size_type distance = position - this->begin();
 		if (this->size() + n > this->_capacity * 2)
 			this->reserve(this->size() + n);
 		else if (this->size() + n > this->_capacity)
 			this->reserve(this->_capacity * 2);
+		pointer positionptr = this->_start + distance;
 		if (distance < this->size())
 		{
-			temp = this->_end + n - 1;
-			this->_end += n;
-			for (size_type i = 0; (this->_start + distance + i) < this->_end; i++)
+			for (; positionptr < this->_end; positionptr++)
 			{
-				this->_allocator.construct(temp, *(temp - n));
-				this->_allocator.destroy(temp - n);
-				temp--;
+				this->_allocator.construct(positionptr + n, *positionptr);
+				this->_allocator.destroy(positionptr);
 			}
-			for (temp = this->_start; first != last; temp++)
-				this->insert(this->end(), *(first++));
-
+			positionptr = this->_start + distance;
 		}
-		else
+		while (first != last)
 		{
-			for (; first != last; first++)
-				this->insert(this->end(), *first);
+			this->_allocator.construct(positionptr++, *first);
+			this->_end++;
+			first++;
 		}
 	}
+	
 	// erase
 	iterator erase (iterator position)
 	{
-		pointer p = &*position;
+		pointer p = position.base();
+		if (this->size() == 0)
+			return (position);
 		if (this->size() == 1)
 			this->_allocator.destroy(p);
 		else
 		{
 			while (p + 1 != this->_end)
 			{
+				std::cout << (p + 1) << " " << this->_end << std::endl;
 				this->_allocator.construct(p, *(p + 1));
 				this->_allocator.destroy(p + 1);
 				p++;
 			}
 		}	
 		this->_end--;
-		return (0);
+		return (iterator(p));
 	}
 
 	iterator erase (iterator first, iterator last)
 	{
-		pointer pfirst = &*first;
-		pointer plast = &*last;
+		pointer pfirst = first.base();
+		pointer plast = last.base();
 		size_type distance = last - first;
 		plast--;
 		while (plast-- != pfirst)
