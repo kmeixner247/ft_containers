@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/11 16:06:12 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/17 17:27:24 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/21 23:52:56 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,14 @@ struct enable_if<true, T>
 
 template <class T, T v>
 struct integral_constant {
-  //static constexpr T value = v; can I just replace that with const?
-  static const T value = v;
-  typedef T value_type;
-  typedef integral_constant<T,v> type;
- // constexpr operator T() { return v; } //wat dat?
+	static const T value = v;
+	typedef T value_type;
+	typedef integral_constant<T,v> type;
 };
 
 typedef integral_constant<bool,true> true_type;
 typedef integral_constant<bool,false> false_type;
+
 
 template <class T> struct is_integral : false_type {};
 
@@ -55,6 +54,7 @@ template <> struct is_integral<unsigned short int> : true_type {};
 template <> struct is_integral<unsigned int> : true_type {};
 template <> struct is_integral<unsigned long int> : true_type {};
 template <> struct is_integral<unsigned long long int> : true_type {};
+
 
 template <class InputIterator1, class InputIterator2>
 bool equal ( InputIterator1 first1, InputIterator1 last1, InputIterator2 first2 )

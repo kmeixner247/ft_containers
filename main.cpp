@@ -6,101 +6,106 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/18 11:47:47 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/22 01:14:39 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vector.hpp"
 #include <vector>
-int main()
+#include <iterator>
+class B {
+public:
+    char *l;
+    int i;
+    B():l(nullptr), i(1) {};
+    B(const int &ex) {
+        this->i = ex;
+        this->l = new char('a');
+    };
+    virtual ~B() {
+        delete this->l;
+        this->l = nullptr;
+    };
+};
+
+class A : public B {
+public:
+    A():B(){};
+    A(const B* ex){
+        this->l = new char(*(ex->l));
+        this->i = ex->i;
+        if (ex->i == -1) throw "n";
+    }
+    ~A() {
+        delete this->l;
+        this->l = nullptr;
+    };
+};
+
+void print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores(ft::vector<int> vector)
 {
-	// std::vector<int> OG1;
-	// std::vector<char> OG2(5, 'X');
-	// ft::vector<int> testvector;
-	// ft::vector<char> testvector2(25, 'X');
-	// for (int i = 0; testvector2.begin() + i != testvector2.end(); i++)
-	// 	std::cout << "i: " << i << " content: " << *(testvector2.begin() + i) << std::endl;
-	// std::cout << (testvector2.begin() - testvector2.end()) << std::endl;
-	// std::cout << (testvector2.begin() < testvector2.end()) << std::endl;
-	// std::cout << (testvector2.begin() > testvector2.end()) << std::endl;
-	// std::cout << (testvector2.begin() <= testvector2.end()) << std::endl;
-	// std::cout << (testvector2.begin() >= testvector2.end()) << std::endl;
-	// std::cout << (testvector2.begin() <= testvector2.begin()) << std::endl;
-	// std::cout << (testvector2.begin() >= testvector2.begin()) << std::endl;
-	// std::cout << (testvector2.begin() == testvector2.begin()) << std::endl;
-	// std::cout << (testvector2.begin() == testvector2.end()) << std::endl;
-	// std::cout << (testvector2.begin() != testvector2.begin()) << std::endl;
-	// std::cout << (testvector2.begin() != testvector2.end()) << std::endl;
-	// std::cout << OG1.max_size() << std::endl;
-	// std::cout << OG2.max_size() << std::endl;
-	// std::cout << testvector.max_size() << std::endl;
-	// std::cout << testvector2.max_size() << std::endl;
-	// ft::vector<char> abcdef(testvector2.begin(), testvector2.end());
-	// for (int i = 0; abcdef.begin() + i != abcdef.end(); i++)
-	// 	std::cout << "i: " << i << " content: " << *(abcdef.begin() + i) << std::endl;
-	ft::vector<int> zero(5, 1);
-	ft::vector<int> one(zero);
-	std::cout << "capacity: " << one.capacity() << " size: " << one.size() << std::endl;
-	for (int i = 0; one.begin() + i != one.end(); i++)
-		std::cout << "1: i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
-	
-	// one.insert(one.end(), 12, 2);
-	ft::vector<int> two(33, 19);
-	// one.assign(5, 19);
-	// one.insert(one.begin() + 5, two.begin(), two.end());
-	// one.push_back(3);
-	one.erase(one.begin() + 1, one.end());
-	one.push_back(5);
-	one.push_back(8);
-	one.push_back(2);
-	one.push_back(123);
-	one.push_back(-2);
-	one.push_back(0);
-	one.pop_back();
-	one.pop_back();
-	// one.erase(one.begin());
-	
-	std::cout << "capacity: " << one.capacity() << " size: " << one.size() << std::endl;
-	for (int i = 0; one.begin() + i != one.end(); i++)
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	for (ft::random_access_iterator<int> it = vector.begin(); it != vector.end(); it++)
 	{
-		std::cout << "i: " << i << " content: " << *(one.begin() + i) << " address: " << &*(one.begin() + i) << std::endl;
+		std::cout << *it << std::endl;
 	}
-	std::cout << "capacity: " << one.capacity() << " size: " << one.size() << std::endl;
-	std::cout << (one == two) << std::endl;
-	ft::vector<int> three(one);
-	std::cout << (one == three) << std::endl;
-	std::string s = "approvjvorppa";
-	std::cout << (ft::equal(s.begin(), s.begin() + s.size()/2, s.rbegin())) << std::endl;
-	
-    std::vector<int> result, result_2;
-	ft::vector<int> V_int1, V_int2, V_int3;
-	ft::vector<std::string> V_str1, V_str2, V_str3;
-	V_int3.push_back(1);
-	V_str1.push_back("aa");
-	V_str2.push_back("ab");
-	std::cout <<  "should be true: " << std::boolalpha << (V_int1 == V_int2) << std::endl;
-	V_int1.push_back(1);
-	std::cout <<  "should be false: " << std::boolalpha << (V_int1 == V_int2) << std::endl;
-	V_int2.push_back(2);
-	std::cout <<  "should be false: " << std::boolalpha << (V_int1 == V_int2) << std::endl;
-	std::cout <<  "should be true: " << std::boolalpha << (V_int1 == V_int3) << std::endl;
-	result_2.push_back(V_int1 == V_int3);
-	result_2.push_back(V_str1 == V_str2);
-	V_str3 = V_str2;
-	std::cout <<  "should be false: " << std::boolalpha << (V_str1 == V_str2) << std::endl;
-	std::cout <<  "should be true: " << std::boolalpha << (V_str2 == V_str3) << std::endl;
-	std::cout << V_int1.at(0) << std::endl;
-	// for (size_t i = 0; result_2.begin() + i != result_2.end(); i++)
-	// 	std::cout <<"x: "<< result_2.at(i) << std::endl;
-	// std::vector<int> two;
-	// one.reserve(one.max_size() + 1);
-	ft::vector<int> pls;
-	// pls.push_back(1);
-	pls.insert(pls.end(), 5, 5);
-	std::cout << pls[0] << std::endl;
-	std::cout << pls[1] << std::endl;
-	std::cout << pls[2] << std::endl;
-	std::cout << pls[3] << std::endl;
-	std::cout << pls[4] << std::endl;
-	std::cout << pls.capacity() << " " << pls.size() << std::endl;
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
 }
+
+void print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores2(std::vector<int> vector)
+{
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	for (size_t n = 0; vector.begin() + n != vector.end(); n++)
+		std::cout << vector[n] << std::endl;
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+}
+
+int main()
+{   
+	// size_t _ratio = 1;
+	// {
+	// 	ft::vector<int> v;
+	// 	ft::vector<int> vector;
+	// 	vector.assign(9900 * _ratio, 1);
+	// 	vector.resize(5000 * _ratio);
+	// 	vector.reserve(5000 * _ratio);
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	vector.resize(7000 * _ratio);
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	vector.resize(15300 * _ratio, int());
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	v.push_back(vector[65]);
+	// 	print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores(v);
+	// }
+	// 	std::vector<int> v;
+	// 	std::vector<int> vector;
+	// 	size_t _ratio = 10000;
+	// 	vector.assign(9900 * _ratio, 1);
+	// 	vector.resize(5000 * _ratio);
+	// 	vector.reserve(5000 * _ratio);
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	vector.resize(7000 * _ratio);
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	std::cout << vector.capacity() << std::endl;
+	// 	vector.resize(15300 * _ratio, int());
+	// 	std::cout << 15300 * _ratio << "???" << vector.capacity() << " wtf " << std::endl;
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	v.push_back(vector[65]);
+	// 	print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores2(v);
+	// {
+	// }
+	// std::cout << (std::is_integral<long long>() == ft::is_integral<long long>()) << std::endl;
+	ft::vector<int> vct3;
+	for (int i = 0; i < 5; ++i)
+		vct3.insert(vct3.end(), i);
+	print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores(vct3);
+	std::cout << vct3.capacity() << std::endl;
+	vct3.insert(vct3.begin() + 1, 2, 111);
+	print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores(vct3);
+	}
