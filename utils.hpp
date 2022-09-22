@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/11 16:06:12 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/22 01:59:27 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/22 02:29:40 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,33 +27,34 @@ struct enable_if<true, T>
 
 
 template <class T, T v>
-struct integral_constant {
+class integral_constant {
+public:
 	static const T value = v;
 	typedef T value_type;
 	typedef integral_constant<T,v> type;
+	operator value_type() {return (this->value);}
 };
 
 typedef integral_constant<bool,true> true_type;
 typedef integral_constant<bool,false> false_type;
 
+template <class T> struct is_integral : public false_type {};
 
-template <class T> struct is_integral : false_type {};
-
-template <> struct is_integral<bool> : true_type {};
-template <> struct is_integral<char> : true_type {};
-template <> struct is_integral<char16_t> : true_type {};
-template <> struct is_integral<char32_t> : true_type {};
-template <> struct is_integral<wchar_t> : true_type {};
-template <> struct is_integral<signed char> : true_type {};
-template <> struct is_integral<short int> : true_type {};
-template <> struct is_integral<int> : true_type {};
-template <> struct is_integral<long int> : true_type {};
-template <> struct is_integral<long long int> : true_type {};
-template <> struct is_integral<unsigned char> : true_type {};
-template <> struct is_integral<unsigned short int> : true_type {};
-template <> struct is_integral<unsigned int> : true_type {};
-template <> struct is_integral<unsigned long int> : true_type {};
-template <> struct is_integral<unsigned long long int> : true_type {};
+template <> struct is_integral<bool> : public true_type {};
+template <> struct is_integral<char> : public true_type {};
+template <> struct is_integral<char16_t> : public true_type {};
+template <> struct is_integral<char32_t> : public true_type {};
+template <> struct is_integral<wchar_t> : public true_type {};
+template <> struct is_integral<signed char> : public true_type {};
+template <> struct is_integral<short int> : public true_type {};
+template <> struct is_integral<int> : public true_type {};
+template <> struct is_integral<long int> : public true_type {};
+template <> struct is_integral<long long int> : public true_type {};
+template <> struct is_integral<unsigned char> : public true_type {};
+template <> struct is_integral<unsigned short int> : public true_type {};
+template <> struct is_integral<unsigned int> : public true_type {};
+template <> struct is_integral<unsigned long int> : public true_type {};
+template <> struct is_integral<unsigned long long int> : public true_type {};
 
 
 template <class InputIterator1, class InputIterator2>
