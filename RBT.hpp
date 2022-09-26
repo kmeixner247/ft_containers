@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/26 20:16:22 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/26 20:47:33 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,28 +19,32 @@
 #define BLACK false
 namespace ft
 {
+template<typename T>
 struct Node
 {
-	int content;
+	T content;
 	Node *parent;
 	Node *lc;
 	Node *rc;
 	bool colour;
 };
 
-// template<typename T, class Alloc = std::allocator<T>, class Compare = std::less<T>>
+template<typename T>
 class RBT
 {
 public:
 	RBT()
 	{
-		this->_null = new Node;
+		this->_null = new Node<T>;
 		this->_null->colour = BLACK;
 		this->_null->lc = NULL;
 		this->_null->rc = NULL;
 		this->_root = this->_null;
 	}
-
+	~RBT()
+	{
+		delete this->_null;
+	}
 	void print_tree()
 	{
 		std::cout << this->_root->content << std::endl;
@@ -48,7 +52,7 @@ public:
 
 	void find_number(int num)
 	{
-		Node *current = this->_root;
+		Node<T> *current = this->_root;
 		std::cout << "###############################################" << std::endl;
 		std::cout << "TRYING TO FIND " << num << std::endl;
 		std::cout << "ROOT IS " << this->_root->content << " and " << (current->colour == RED ? "red" : "black") << std::endl;
@@ -90,9 +94,9 @@ public:
 		}
 	}
 
-	Node *find_node(int num)
+	Node<T> *find_node(int num)
 	{
-		Node *current = this->_root;
+		Node<T> *current = this->_root;
 		while (current)
 		{
 			if (current->content == num)
@@ -117,7 +121,7 @@ public:
 
 	void insert(int val)
 	{
-		Node *newnode = new Node;
+		Node<T> *newnode = new Node<T>;
 		newnode->content = val;
 		newnode->parent = NULL;
 		newnode->lc = NULL;
@@ -174,21 +178,21 @@ public:
 		}
 	}
 
-	void printBT(const Node *node)
+	void printBT(const Node<T> *node)
 	{
 		printBT("", node, false);
 	}
 
-	Node *getRoot()
+	Node<T> *getRoot()
 	{
 		return (this->_root);
 	}
 
-	Node *successor(Node *node)
+	Node<T> *successor(Node<T> *node)
 	{
 		if (node->rc)
 			return (minimum(node->rc));
-		Node *temp = node->parent;
+		Node<T> *temp = node->parent;
 		while (temp && node == temp->rc)
 		{
 			node = temp;
@@ -197,11 +201,11 @@ public:
 		return (temp);
 	}
 
-	Node *predecessor(Node *node)
+	Node<T> *predecessor(Node<T> *node)
 	{
 		if (node->lc)
 			return (maximum(node->lc));
-		Node *temp = node->parent;
+		Node<T> *temp = node->parent;
 		while (temp && node == temp->lc)
 		{
 			node = temp;
@@ -210,14 +214,14 @@ public:
 		return (temp);
 	}
 
-	Node *minimum(Node *node)
+	Node<T> *minimum(Node<T> *node)
 	{
 		while (node->lc)
 			node = node->lc;
 		return (node);
 	}
 
-	Node *maximum(Node *node)
+	Node<T> *maximum(Node<T> *node)
 	{
 		while (node->rc)
 			node = node->rc;
@@ -225,10 +229,10 @@ public:
 	}
 	void delete_by_value(int n)
 	{
-		Node *node = bst_deletion(find_node(n));
-		Node *temp = NULL;
-		Node *sibling;
-		Node *org;
+		Node<T> *node = bst_deletion(find_node(n));
+		Node<T> *temp = NULL;
+		Node<T> *sibling;
+		Node<T> *org;
 		if (node->colour == RED)	//NODE RED WE CAN JUST DELETE
 		{
 			if ((temp = node->lc) || (temp = node->rc))
@@ -345,10 +349,10 @@ public:
 		}
 	}
 private:
-	Node *_root;
-	Node *_null;
+	Node<T> *_root;
+	Node<T> *_null;
 
-	void printBT(const std::string &prefix, const Node *node, bool isLeft)
+	void printBT(const std::string &prefix, const Node<T> *node, bool isLeft)
 	{
 		if (node)
 		{
@@ -362,9 +366,9 @@ private:
 		}
 	}
 
-	Node *bst_deletion(Node *node)
+	Node<T> *bst_deletion(Node<T> *node)
 	{
-		Node *temp = node;
+		Node<T> *temp = node;
 		while (node && node->rc && node->lc)
 		{
 			temp = successor(node);
@@ -374,7 +378,7 @@ private:
 		return (node);
 	}
 
-	void swap_nodes(Node *node, Node *other)
+	void swap_nodes(Node<T> *node, Node<T> *other)
 	{
 		int temp;
 		temp = node->content;
@@ -382,9 +386,9 @@ private:
 		other->content = temp;
 	}
 
-	void bst_insertion(Node *node)
+	void bst_insertion(Node<T> *node)
 	{
-		Node *current = this->_root;
+		Node<T> *current = this->_root;
 		while (current)
 		{
 			if (node->content < current->content)
@@ -412,15 +416,15 @@ private:
 		}
 	}
 
-	void recolour(Node *node)
+	void recolour(Node<T> *node)
 	{
 		if (!node)
 			return ;
 		node->colour = !node->colour;
 	}
-	void rotate_left(Node *node)
+	void rotate_left(Node<T> *node)
 	{
-		Node *temp = node->rc;
+		Node<T> *temp = node->rc;
 		node->rc = temp->lc;
 		if (temp->lc)
 			temp->lc->parent = node;
@@ -435,9 +439,9 @@ private:
 		node->parent = temp;
 	}
 	
-	void rotate_right(Node *node)
+	void rotate_right(Node<T> *node)
 	{
-		Node *temp = node->lc;
+		Node<T> *temp = node->lc;
 		node->lc = temp->rc;
 		if (temp->rc)
 			temp->rc->parent = node;
