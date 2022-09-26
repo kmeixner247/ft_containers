@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/22 02:56:00 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/23 13:58:06 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,12 +290,7 @@ public:
 	{
 		this->insert(this->_end, val);
 	}
-	// pop_back
-	void pop_back()
-	{
-		if (this->_start != this->_end)
-			this->erase(this->end() - 1);
-	}
+	
 	
 	// insert single
 	iterator insert (iterator position, const value_type& val)
