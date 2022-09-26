@@ -6,12 +6,12 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/23 13:58:06 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/26 21:03:33 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef RANDOMTESTS_HPP
-#define RANDOMTESTS_HPP
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 #include <memory>
 #include <iostream>
 #include <stdexcept>
