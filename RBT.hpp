@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/26 20:47:33 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/27 11:08:19 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,24 @@ struct Node
 	bool colour;
 };
 
-template<typename T>
+template<typename T, typename Alloc = std::allocator<T>, typename Compare = std::less<T> >
 class RBT
 {
 public:
-	RBT()
+	typedef T value_type;
+	typedef Compare key_compare;
+	typedef Alloc allocator_type;
+	typedef Node<T>* node_pointer;
+	typedef typename allocator_type::reference reference;
+	typedef typename allocator_type::const_reference const_reference;
+	typedef typename allocator_type::pointer pointer;
+	typedef typename allocator_type::const_pointer const_pointer;
+	typedef ptrdiff_t difference_type;
+	typedef size_t size_type;
+	
+	RBT(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _compare(comp)
 	{
-		this->_null = new Node<T>;
+		this->_null = this->_nodealloc.allocate(1);
 		this->_null->colour = BLACK;
 		this->_null->lc = NULL;
 		this->_null->rc = NULL;
@@ -43,65 +54,21 @@ public:
 	}
 	~RBT()
 	{
-		delete this->_null;
+		this->_nodealloc.deallocate(this->_null, 1);
 	}
 	void print_tree()
 	{
 		std::cout << this->_root->content << std::endl;
 	}
 
-	void find_number(int num)
+	node_pointer find_node(value_type val)
 	{
-		Node<T> *current = this->_root;
-		std::cout << "###############################################" << std::endl;
-		std::cout << "TRYING TO FIND " << num << std::endl;
-		std::cout << "ROOT IS " << this->_root->content << " and " << (current->colour == RED ? "red" : "black") << std::endl;
+		node_pointer current = this->_root;
 		while (current)
 		{
-			if (current->content == num)
-			{
-				std::cout << "Found " << num << " in a " << (current->colour == RED ? "red" : "black") << " node!" << std::endl;
-				return ;
-			}
-			else if (current->content > num)
-			{
-				std::cout << current->content << " is larger than " << num << ". ";
-				if (current->lc)
-				{
-					std::cout << "Going down the tree to the left." << std::endl;
-					current = current->lc;
-				}
-				else
-				{
-					std::cout << num << "is not in the tree!" << std::endl;
-					return ;
-				}
-			}
-			else
-			{
-				std::cout << current->content << " is smaller than " << num << ". ";
-				if (current->rc)
-				{
-					std::cout << "Going down the tree to the right." << std::endl;
-					current = current->rc;
-				}
-				else
-				{
-					std::cout << num << " is not in the tree!" << std::endl;
-					return ;
-				}
-			}
-		}
-	}
-
-	Node<T> *find_node(int num)
-	{
-		Node<T> *current = this->_root;
-		while (current)
-		{
-			if (current->content == num)
+			if (current->content == val)
 				return (current);
-			else if (current->content > num)
+			else if (this->_compare(val, current->content))
 			{
 				if (current->lc)
 					current = current->lc;
@@ -119,10 +86,10 @@ public:
 		return (NULL);
 	}
 
-	void insert(int val)
+	void insert(value_type val)
 	{
-		Node<T> *newnode = new Node<T>;
-		newnode->content = val;
+		node_pointer newnode = this->_nodealloc.allocate(1);
+		this->_allocator.construct(&newnode->content, val);
 		newnode->parent = NULL;
 		newnode->lc = NULL;
 		newnode->rc = NULL;
@@ -135,11 +102,8 @@ public:
 		}
 		newnode->colour = RED;
 		bst_insertion(newnode);
-		// if (newnode->parent->colour == BLACK)	//Case 2: Parent is black - nothing to be done
-		// 	return ;
-		// else	//Case 3: Parent is red
-		// {
-		while (newnode->parent && newnode->parent->colour == RED)
+		//Case 2: Parent is black - nothing to be done
+		while (newnode->parent && newnode->parent->colour == RED)		//Case 3: Parent is red
 		{
 			if (newnode->parent->parent->lc && newnode->parent->parent->rc && newnode->parent->parent->lc->colour == RED && newnode->parent->parent->rc->colour == RED)	//Case 3.1: Parent and Uncle are both red - recolour Parent, Uncle and Grandparent
 			{
@@ -178,21 +142,21 @@ public:
 		}
 	}
 
-	void printBT(const Node<T> *node)
+	void printBT(const node_pointer node)
 	{
 		printBT("", node, false);
 	}
 
-	Node<T> *getRoot()
+	node_pointer getRoot()
 	{
 		return (this->_root);
 	}
 
-	Node<T> *successor(Node<T> *node)
+	node_pointer successor(node_pointer node)
 	{
 		if (node->rc)
 			return (minimum(node->rc));
-		Node<T> *temp = node->parent;
+		node_pointer temp = node->parent;
 		while (temp && node == temp->rc)
 		{
 			node = temp;
@@ -201,11 +165,11 @@ public:
 		return (temp);
 	}
 
-	Node<T> *predecessor(Node<T> *node)
+	node_pointer predecessor(node_pointer node)
 	{
 		if (node->lc)
 			return (maximum(node->lc));
-		Node<T> *temp = node->parent;
+		node_pointer temp = node->parent;
 		while (temp && node == temp->lc)
 		{
 			node = temp;
@@ -214,25 +178,30 @@ public:
 		return (temp);
 	}
 
-	Node<T> *minimum(Node<T> *node)
+	node_pointer minimum(node_pointer node)
 	{
+		if (!_root)
+			return (NULL);
 		while (node->lc)
 			node = node->lc;
 		return (node);
 	}
 
-	Node<T> *maximum(Node<T> *node)
+	node_pointer maximum(node_pointer node)
 	{
+		if (!_root)
+			return (NULL);
 		while (node->rc)
 			node = node->rc;
 		return (node);
 	}
-	void delete_by_value(int n)
+
+	void delete_by_value(T val)
 	{
-		Node<T> *node = bst_deletion(find_node(n));
-		Node<T> *temp = NULL;
-		Node<T> *sibling;
-		Node<T> *org;
+		node_pointer node = bst_deletion(find_node(val));
+		node_pointer temp = NULL;
+		node_pointer sibling;
+		node_pointer org;
 		if (node->colour == RED)	//NODE RED WE CAN JUST DELETE
 		{
 			if ((temp = node->lc) || (temp = node->rc))
@@ -244,7 +213,8 @@ public:
 				node->parent->lc = NULL;
 			else
 				node->parent->rc = NULL;
-			delete node;
+			// delete node;
+			this->_nodealloc.deallocate(node, 1);
 		}
 		else if (((temp = node->lc) && node->lc->colour == RED) || ((temp = node->rc) && node->rc->colour == RED))
 		{	//CHILD RED WE CAN JUST SWAP AND DELETE
@@ -253,7 +223,8 @@ public:
 			node->parent->colour = BLACK;
 			node->parent->lc = NULL;
 			node->parent->rc = NULL;
-			delete node;
+			this->_nodealloc.deallocate(node, 1);
+			// delete node;
 		}
 		else	//NODE BLACK AND NO RED CHILD: MANY OPTIONS
 		{
@@ -341,18 +312,25 @@ public:
 				swap_nodes(temp, org);
 				org = temp;
 			}
-			if (org == org->parent->lc)
-				org->parent->lc = NULL;
-			else
-				org->parent->rc = NULL;
-			delete org;
+			if (org->parent)
+			{
+				if (org == org->parent->lc)
+					org->parent->lc = NULL;
+				else
+					org->parent->rc = NULL;
+			}
+			this->_nodealloc.deallocate(org, 1);
+			// delete org;
 		}
 	}
 private:
-	Node<T> *_root;
-	Node<T> *_null;
+	node_pointer _root;
+	node_pointer _null;
+	allocator_type _allocator;
+	key_compare _compare;
+	std::allocator<Node<T> > _nodealloc;
 
-	void printBT(const std::string &prefix, const Node<T> *node, bool isLeft)
+	void printBT(const std::string &prefix, const node_pointer node, bool isLeft)
 	{
 		if (node)
 		{
@@ -366,9 +344,9 @@ private:
 		}
 	}
 
-	Node<T> *bst_deletion(Node<T> *node)
+	node_pointer bst_deletion(node_pointer node)
 	{
-		Node<T> *temp = node;
+		node_pointer temp = node;
 		while (node && node->rc && node->lc)
 		{
 			temp = successor(node);
@@ -378,7 +356,7 @@ private:
 		return (node);
 	}
 
-	void swap_nodes(Node<T> *node, Node<T> *other)
+	void swap_nodes(node_pointer node, node_pointer other)
 	{
 		int temp;
 		temp = node->content;
@@ -386,12 +364,13 @@ private:
 		other->content = temp;
 	}
 
-	void bst_insertion(Node<T> *node)
+	void bst_insertion(node_pointer node)
 	{
-		Node<T> *current = this->_root;
+		node_pointer current = this->_root;
 		while (current)
 		{
-			if (node->content < current->content)
+			// if (node->content < current->content)
+			if (this->_compare(node->content, current->content))
 			{
 				if (current->lc)
 					current = current->lc;
@@ -416,15 +395,15 @@ private:
 		}
 	}
 
-	void recolour(Node<T> *node)
+	void recolour(node_pointer node)
 	{
 		if (!node)
 			return ;
 		node->colour = !node->colour;
 	}
-	void rotate_left(Node<T> *node)
+	void rotate_left(node_pointer node)
 	{
-		Node<T> *temp = node->rc;
+		node_pointer temp = node->rc;
 		node->rc = temp->lc;
 		if (temp->lc)
 			temp->lc->parent = node;
@@ -439,9 +418,9 @@ private:
 		node->parent = temp;
 	}
 	
-	void rotate_right(Node<T> *node)
+	void rotate_right(node_pointer node)
 	{
-		Node<T> *temp = node->lc;
+		node_pointer temp = node->lc;
 		node->lc = temp->rc;
 		if (temp->rc)
 			temp->rc->parent = node;
@@ -455,6 +434,12 @@ private:
 		temp->rc = node;
 		node->parent = temp;
 	}
+	void clear()
+	{
+		// temp = 0;
+		//CLEAR EVERYTHING
+	}
+	
 };
 }	//namespace ft end
 #endif

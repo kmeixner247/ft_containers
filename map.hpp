@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/26 21:30:10 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/27 11:05:06 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,14 @@ public:
 	typedef Alloc allocator_type;
 	typedef typename allocator_type::reference reference;
 	typedef typename allocator_type::const_reference const_reference;
-	typedef typename allocator_Type::pointer pointer;
+	typedef typename allocator_Type::pointer xpointer;
 	typedef typename allocator_Type::const_pointer const_pointer;
 	//iterators
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
-	
+	typedef RBT<value_type> tree_type;
 	//Default / empty container constructor
-	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(ft::RBT()), _allocator(alloc), _compare(comp)
 	{}
 
 	//Range constructor
@@ -138,7 +138,9 @@ public:
 	{}
 
 	void clear()
-	{}
+	{
+		this->_tree.clear();
+	}
 
 	/*	
 		OBSERVERS MEMBER FUNCTIONS
@@ -184,10 +186,15 @@ public:
 	*/
 
 	allocator_type get_allocator() const
-	{}
+	{
+		return (this->_allocator);
+	}
 	
 private:
-	RBT<value_type>
+	ft::RBT<value_type> _tree;
+	allocator_type _allocator;
+	key_compare _compare;
+	
 };
 
 /*	
