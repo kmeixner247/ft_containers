@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/11 16:06:12 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/23 14:02:47 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/27 18:41:35 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,18 @@ template <class T1, class T2>
 pair<T1,T2> make_pair (T1 x, T2 y)
 {
 	return (pair<T1,T2>(x,y));
+}
+
+template<typename T>
+T get_key(T key)
+{
+	return (key);
+}
+
+template<typename key, typename value>
+key get_key(ft::pair<key, value> pair)
+{
+	return (pair.first);
 }
 }		//namespace end
 #endif

@@ -6,13 +6,15 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/27 11:00:18 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/28 00:25:42 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vector.hpp"
 #include "RBT.hpp"
 #include <vector>
+#include "map.hpp"
+#include <map>
 #include <iterator>
 class B {
 public:
@@ -65,43 +67,53 @@ void print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores2(std::vector
 
 int main()
 {   
-	ft::RBT<int> test;
-	test.insert(10);
-	test.insert(30);
-	test.insert(25);
-	test.insert(40);
-	test.insert(-10);
-	test.insert(4);
-	test.insert(3);
-	test.insert(9);
-	test.insert(2);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(4);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(40);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(30);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(2);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(9);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(25);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(3);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(-10);
-	test.printBT(test.getRoot());
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	test.delete_by_value(10);
+	// ft::RBT<int> test;
+	// test.insert(10);
+	// test.insert(30);
+	// test.insert(25);
+	// test.insert(40);
+	// test.insert(-10);
+	// test.insert(4);
+	// test.insert(3);
+	// test.insert(9);
+	// test.insert(2);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(4);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(40);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(30);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(2);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(9);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(25);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(3);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(-10);
+	// test.printBT(test.getRoot());
+	// std::cout << test.size() << std::endl;
+	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	// test.delete_by_value(10);
+	// std::cout << test.size() << std::endl;
 	// ft::RBT<char> test2;
 	// test2.insert('A');
 	// test2.insert('J');
@@ -111,4 +123,13 @@ int main()
 	
 	// test.delete_by_value(2);
 	// test.printBT(test.getRoot());
+	ft::map<int, std::string> test;
+	test.insert(ft::make_pair<int, std::string>(5, "hello"));
+	test.insert(ft::make_pair<int, std::string>(1, "hello"));
+	test.insert(ft::make_pair<int, std::string>(8, "hello"));
+	test.insert(ft::make_pair<int, std::string>(1234, "hello"));
+	test.insert(ft::make_pair<int, std::string>(33, "hello"));
+	test.insert(ft::make_pair<int, std::string>(-42, "hello"));
+	test.insert(ft::make_pair<int, std::string>(42, "hello"));
+	test.tempprint();
 }

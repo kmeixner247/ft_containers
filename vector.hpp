@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/26 21:03:33 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/27 12:10:11 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ public:
 	typedef typename allocator_type::const_reference const_reference;
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
-	typedef typename ft::random_access_iterator<T> iterator;
-	typedef typename ft::constant_random_access_iterator<const T> const_iterator;
+	typedef typename ft::random_access_iterator<value_type> iterator;
+	typedef typename ft::constant_random_access_iterator<const value_type> const_iterator;
 	typedef typename ft::reverse_iterator<iterator> reverse_iterator;
 	typedef typename ft::reverse_iterator<const_iterator> const_reverse_iterator;
 	typedef ptrdiff_t difference_type;

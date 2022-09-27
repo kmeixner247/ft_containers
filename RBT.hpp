@@ -6,12 +6,15 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/27 11:08:19 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/28 00:26:57 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #ifndef RBT_HPP
 #define RBT_HPP
+#include "utils.hpp"
+#include "RBT_iterator.hpp"
 #include <functional>
 #include <memory>
 #include <iostream>
@@ -20,8 +23,9 @@
 namespace ft
 {
 template<typename T>
-struct Node
+class Node
 {
+public:
 	T content;
 	Node *parent;
 	Node *lc;
@@ -29,7 +33,7 @@ struct Node
 	bool colour;
 };
 
-template<typename T, typename Alloc = std::allocator<T>, typename Compare = std::less<T> >
+template<typename T, typename Compare, typename Alloc = std::allocator<T> >
 class RBT
 {
 public:
@@ -44,31 +48,58 @@ public:
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
 	
-	RBT(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _compare(comp)
+	RBT(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 	{
-		this->_null = this->_nodealloc.allocate(1);
-		this->_null->colour = BLACK;
-		this->_null->lc = NULL;
-		this->_null->rc = NULL;
-		this->_root = this->_null;
+		this->_compare = comp;
+		this->_allocator = alloc;
+		this->_end = this->_nodealloc.allocate(1);
+		this->_end->colour = BLACK;
+		this->_end->lc = NULL;
+		this->_end->rc = NULL;
+		this->_root = this->_end;
 	}
+
+	RBT (const RBT &rhs)
+	{
+		
+	}
+	
 	~RBT()
 	{
-		this->_nodealloc.deallocate(this->_null, 1);
+		this->_nodealloc.deallocate(this->_end, 1);
 	}
 	void print_tree()
 	{
 		std::cout << this->_root->content << std::endl;
 	}
 
+	size_type size()
+	{
+		size_type n = 0;
+		node_pointer temp = this->minimum(this->_root);
+		while (temp != this->_end)
+		{
+			n++;
+			temp = this->successor(temp);
+		}
+		return (n);
+	}
+
+	node_pointer get_end()
+	{
+		return (this->_end);
+	}
+
 	node_pointer find_node(value_type val)
 	{
 		node_pointer current = this->_root;
+		if (current == this->_end)
+			return (NULL);
 		while (current)
 		{
 			if (current->content == val)
 				return (current);
-			else if (this->_compare(val, current->content))
+			else if (this->_compare(get_key(val), get_key(current->content)))
 			{
 				if (current->lc)
 					current = current->lc;
@@ -86,19 +117,22 @@ public:
 		return (NULL);
 	}
 
-	void insert(value_type val)
+	node_pointer insert(value_type val)
 	{
+		if (find_node(val))
+			return (NULL);
 		node_pointer newnode = this->_nodealloc.allocate(1);
+		node_pointer org = newnode;
 		this->_allocator.construct(&newnode->content, val);
 		newnode->parent = NULL;
 		newnode->lc = NULL;
 		newnode->rc = NULL;
-		if (this->_root == this->_null)	//Case 1: Tree is empty - insert at root and make black
+		if (this->_root == this->_end)	//Case 1: Tree is empty - insert at root and make black
 		{
 			newnode->colour = BLACK;
 			newnode->parent = NULL;
 			this->_root = newnode;
-			return ;
+			return (newnode);
 		}
 		newnode->colour = RED;
 		bst_insertion(newnode);
@@ -140,6 +174,7 @@ public:
 				}
 			}
 		}
+		return (org);
 	}
 
 	void printBT(const node_pointer node)
@@ -154,6 +189,8 @@ public:
 
 	node_pointer successor(node_pointer node)
 	{
+		if (node == this->maximum(this->_root))
+			return (this->_end);
 		if (node->rc)
 			return (minimum(node->rc));
 		node_pointer temp = node->parent;
@@ -167,6 +204,8 @@ public:
 
 	node_pointer predecessor(node_pointer node)
 	{
+		if (node == this->_end)
+			return (this->maximum(this->_root));
 		if (node->lc)
 			return (maximum(node->lc));
 		node_pointer temp = node->parent;
@@ -196,13 +235,24 @@ public:
 		return (node);
 	}
 
-	void delete_by_value(T val)
+	void delete_by_value(value_type val)
 	{
-		node_pointer node = bst_deletion(find_node(val));
+		delete_node(bst_deletion(find_node(val)));
+	}
+
+	void delete_node(node_pointer node)
+	{
 		node_pointer temp = NULL;
 		node_pointer sibling;
 		node_pointer org;
-		if (node->colour == RED)	//NODE RED WE CAN JUST DELETE
+		if (!node)
+			return ;
+		if (this->size() == 1)
+		{
+			this->_nodealloc.deallocate(this->_root, 1);
+			this->_root = this->_end;
+		}
+		else if (node->colour == RED)	//NODE RED WE CAN JUST DELETE
 		{
 			if ((temp = node->lc) || (temp = node->rc))
 			{
@@ -213,7 +263,6 @@ public:
 				node->parent->lc = NULL;
 			else
 				node->parent->rc = NULL;
-			// delete node;
 			this->_nodealloc.deallocate(node, 1);
 		}
 		else if (((temp = node->lc) && node->lc->colour == RED) || ((temp = node->rc) && node->rc->colour == RED))
@@ -224,7 +273,6 @@ public:
 			node->parent->lc = NULL;
 			node->parent->rc = NULL;
 			this->_nodealloc.deallocate(node, 1);
-			// delete node;
 		}
 		else	//NODE BLACK AND NO RED CHILD: MANY OPTIONS
 		{
@@ -325,7 +373,7 @@ public:
 	}
 private:
 	node_pointer _root;
-	node_pointer _null;
+	node_pointer _end;
 	allocator_type _allocator;
 	key_compare _compare;
 	std::allocator<Node<T> > _nodealloc;
@@ -337,7 +385,7 @@ private:
 			std::cout << prefix;
 			std::cout << (isLeft ? "├──" : "└──" );
 			std::cout << (node->colour == RED ? "\x1B[31m" : "");
-			std::cout << node->content << std::endl;
+			std::cout << node->content.first << std::endl;
 			std::cout << (node->colour == RED ? "\033[0m" : "");
         	printBT( prefix + (isLeft ? "│   " : "    "), node->lc, true);
         	printBT( prefix + (isLeft ? "│   " : "    "), node->rc, false);
@@ -370,7 +418,7 @@ private:
 		while (current)
 		{
 			// if (node->content < current->content)
-			if (this->_compare(node->content, current->content))
+			if (this->_compare(get_key(node->content), get_key(current->content)))
 			{
 				if (current->lc)
 					current = current->lc;

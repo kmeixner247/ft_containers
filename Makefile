@@ -6,7 +6,7 @@
 #    By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 10:09:08 by kmeixner          #+#    #+#              #
-#    Updated: 2022/09/27 11:02:08 by kmeixner         ###   ########.fr        #
+#    Updated: 2022/09/27 17:52:44 by kmeixner         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ CC			=	c++
 
 RM			=	rm
 
-CFLAGS		=	-Wall -Werror -Wextra -std=c++98 -g #-fsanitize=address
+CFLAGS		=	#-Wall -Werror -Wextra -std=c++98 -g #-fsanitize=address
 
 all:		$(NAME)
 
