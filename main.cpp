@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/28 00:25:42 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/30 14:40:19 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,69 +67,47 @@ void print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores2(std::vector
 
 int main()
 {   
-	// ft::RBT<int> test;
-	// test.insert(10);
-	// test.insert(30);
-	// test.insert(25);
-	// test.insert(40);
-	// test.insert(-10);
-	// test.insert(4);
-	// test.insert(3);
-	// test.insert(9);
-	// test.insert(2);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(4);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(40);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(30);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(2);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(9);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(25);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(3);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(-10);
-	// test.printBT(test.getRoot());
-	// std::cout << test.size() << std::endl;
-	// std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	// test.delete_by_value(10);
-	// std::cout << test.size() << std::endl;
-	// ft::RBT<char> test2;
-	// test2.insert('A');
-	// test2.insert('J');
-	// test2.insert('R');
-	// test2.insert('X');
-	// test2.printBT(test2.getRoot());
+	{
+
+	ft::map<int, int> one;
+	ft::map<int, int> two;
+	// one.insert(ft::make_pair<int, int>(3, 5));
+	std::cout<< "begin is " << &*(one.begin()) << std::endl;
+	std::cout<< "end is " << &*(one.end()) << std::endl;
+	one.insert(ft::make_pair<int, int>(6, 5));
+	// two.insert(ft::make_pair<int, int>(6, 9));
+	one.insert(ft::make_pair<int, int>(5, 9));
+	std::cout << one.size() << std::endl;
+	one.erase(5);
+	std::cout << one.size() << std::endl;
+	one.clear();
+	ft::map<int, int>::iterator it = one.begin();
+	std::cout << it->first << " " << it->second << std::endl;
+	std::cout << "one == two: " << std::boolalpha	<< (one == two) << std::endl;
+	std::cout << "one != two: " << std::boolalpha	<< (one != two) << std::endl;
+	std::cout << "one < two: " << std::boolalpha << (one < two) << std::endl;
+	// std::cout << (one == two) <<std::endl;;
+	int _ratio = 5000;
+
+	// ft::map<int, int> mp1;
+	// std::vector<int> v1;
+    // for (int i = 0, j = 0; i < 100 * _ratio; ++i, ++j)
+    //     mp1.insert(ft::make_pair(i, j));
+    // v1.push_back(mp1.size());
+    // for (int i = 0; i < 43 * _ratio; ++i)
+    //     mp1.erase(i);
+    // v1.push_back(mp1.size());
+
 	
-	// test.delete_by_value(2);
-	// test.printBT(test.getRoot());
-	ft::map<int, std::string> test;
-	test.insert(ft::make_pair<int, std::string>(5, "hello"));
-	test.insert(ft::make_pair<int, std::string>(1, "hello"));
-	test.insert(ft::make_pair<int, std::string>(8, "hello"));
-	test.insert(ft::make_pair<int, std::string>(1234, "hello"));
-	test.insert(ft::make_pair<int, std::string>(33, "hello"));
-	test.insert(ft::make_pair<int, std::string>(-42, "hello"));
-	test.insert(ft::make_pair<int, std::string>(42, "hello"));
-	test.tempprint();
+	// std::map<int, int> mp2;
+	// std::vector<int> v2;
+    // for (int i = 0, j = 0; i < 100 * _ratio; ++i, ++j)
+    //     mp2.insert(std::make_pair(i, j));
+    // v2.push_back(mp2.size());
+    // for (int i = 0; i < 43 * _ratio; ++i)
+    //     mp2.erase(i);
+    // v2.push_back(mp2.size());
+	// print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores2(v1);
+	// print_the_fucking_vector_mate_bro_yo_whatever_haha_underscores2(v2);
+	}
 }

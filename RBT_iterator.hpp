@@ -6,15 +6,15 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/27 11:15:00 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/28 00:46:52 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/30 20:04:27 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-#pragma once
 #ifndef RBT_ITERATOR_HPP
 #define RBT_ITERATOR_HPP
 #include "RBT.hpp"
+#include "ft_iterator.hpp"
 namespace ft
 {
 template<typename T, typename Tree>
@@ -34,72 +34,95 @@ private:
 	typedef Node<T> node;
 	typedef node * node_pointer;
 public:
-	RBT_iterator() : _current(0), _tree(0) {}
-	RBT_iterator(RBT_iterator const &rhs) : _current(rhs._current), _tree(rhs._tree) {}
-	RBT_iterator(node_pointer p, Tree *tree) : _current(p), _tree(tree) {}
-
+	RBT_iterator() : _current(0), _currentnode(0), _tree(0) {}
+	RBT_iterator(RBT_iterator const &rhs) : _current(rhs._current), _currentnode(rhs._currentnode), _tree(rhs._tree) {}
+	RBT_iterator(node_pointer p, Tree *tree) : _current(p->content), _currentnode(p), _tree(tree) {}
 
 	pointer base() const
 	{
 		return (this->_current);
 	}
 
+	node_pointer getNodeptr() const
+	{
+		return (this->_currentnode);
+	}
+
 	RBT_iterator &operator=(RBT_iterator<T, Tree> const &rhs)
 	{
 		this->_current = rhs._current;
+		this->_currentnode = rhs._currentnode;
+		this->_tree = rhs._tree;
 		return (*this);
 	}
+	
 	RBT_iterator &operator++()
 	{
-		*this = this->_tree->successor(this->_current);
+		this->_currentnode = this->_tree->successor(this->_currentnode);
+		this->_current = this->_currentnode->content;
 		return (*this);
 	}
+	
 	RBT_iterator operator++(int)
 	{
 		RBT_iterator temp(*this);
-		*this = this->_tree->successor(this->_current);
+
+		this->_currentnode = this->_tree->successor(this->_currentnode);
+		this->_current = this->_currentnode->content;
 		return (temp);
 	}
 
 	RBT_iterator &operator--()
 	{
-		*this = this->_tree->predecessor(this->_current);
+		this->_currentnode = this->_tree->predecessor(this->_currentnode);
+		this->_current = &this->_currentnode->content;
+		returm (*this);
 	}
+	
 	RBT_iterator operator--(int)
 	{
 		RBT_iterator temp(*this);
-		*this = this->_tree->predecessor(this->_current);
+		this->_currentnode = this->_tree->predecessor(this->_currentnode);
+		this->_current = &this->_currentnode->content;
 		return (temp);
 	}
 	
 	bool operator==(RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this == *rhs));
+		
+		return ((this->_current == rhs._current));
 	}
+	
 	bool operator==(constant_RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this == *rhs));
+		return ((this->_current == rhs._current));
 	}
+	
 	bool operator!=(RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this != *rhs));
+		return ((this->_current != rhs._current));
 	}
+
 	bool operator!=(constant_RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this != *rhs));
+		return ((this->_current != rhs._current));
 	}
-	T &operator*() const
+	
+	reference operator*() const
 	{
-		return (this->_current->content);
+		return (*this->_current);
 	}
+	
 	pointer operator->() const
 	{
-		return (&(this->_current->content));
+		return (this->_current);
 	}
 private:
-	node_pointer _current;
+	pointer	_current;
+	node_pointer _currentnode;
 	Tree *_tree;
 };
+
 
 template<typename T, typename Tree>
 class constant_RBT_iterator: public iterator<bidirectional_iterator_tag, T>
@@ -114,70 +137,100 @@ private:
 	typedef Node<T> node;
 	typedef node * node_pointer;
 public:
-	constant_RBT_iterator() : _current(0), _tree(0) {}
-	template<typename X, typename XTree>
-	constant_RBT_iterator(const RBT_iterator<X, XTree> &rhs) : _current(rhs._current), _tree(rhs._tree) {}
-	constant_RBT_iterator(const constant_RBT_iterator &rhs) : _current(rhs._current), _tree(rhs._tree) {}
-	constant_RBT_iterator(node_pointer p, Tree *tree) : _current(p), _tree(tree) {}
-
-	pointer base() const
+	constant_RBT_iterator() : _current(0), _currentnode(0), _tree(0) {}
+	constant_RBT_iterator(constant_RBT_iterator const &rhs) : _current(rhs._current), _currentnode(rhs._currentnode), _tree(rhs._tree) {}
+	constant_RBT_iterator(RBT_iterator<T, Tree> const &rhs)
+	{
+		*this = rhs;
+	};
+	constant_RBT_iterator(node_pointer p, Tree *tree) : _current(&p->content), _currentnode(p), _tree(tree) {}
+	const pointer base() const
 	{
 		return (this->_current);
 	}
 
+	constant_RBT_iterator &operator=(RBT_iterator<T, Tree> const &rhs)
+	{
+		this->_current = rhs._current;
+		this->_currentnode = rhs._currentnode;
+		this->_tree = rhs._tree;
+		return (*this);
+	}
+	
 	constant_RBT_iterator &operator=(constant_RBT_iterator<T, Tree> const &rhs)
 	{
 		this->_current = rhs._current;
+		this->_currentnode = rhs._currentnode;
+		this->_tree = rhs._tree;
 		return (*this);
 	}
+	
 	constant_RBT_iterator &operator++()
 	{
-		*this = this->_tree->successor(this->_current);
+		this->_currentnode = this->_tree->successor(this->_currentnode);
+		this->_current = &this->_currentnode->content;
 		return (*this);
 	}
+	
 	constant_RBT_iterator operator++(int)
 	{
 		constant_RBT_iterator temp(*this);
-		*this = this->_tree->successor(this->_current);
+
+		this->_currentnode = this->_tree->successor(this->_currentnode);
+		this->_current = &this->_currentnode->content;
 		return (temp);
 	}
+
 	constant_RBT_iterator &operator--()
 	{
-		*this = this->_tree->predecessor(this->_current);
+		this->_currentnode = this->_tree->predecessor(this->_currentnode);
+		this->_current = &this->_currentnode->content;
+		returm (*this);
 	}
+	
 	constant_RBT_iterator operator--(int)
 	{
 		constant_RBT_iterator temp(*this);
-		*this = this->_tree->predecessor(this->_current);
+		this->_currentnode = this->_tree->predecessor(this->_currentnode);
+		this->_current = &this->_currentnode->content;
 		return (temp);
 	}
-	bool operator==(const RBT_iterator<T, Tree> rhs) const
+	
+	bool operator==(RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this == *rhs));
+		
+		return ((*this->_current == *rhs._current));
 	}
-	bool operator==(const constant_RBT_iterator<T, Tree> rhs) const
+	
+	bool operator==(constant_RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this == *rhs));
+		return ((*this->_current == *rhs._current));
 	}
-	bool operator!=(const RBT_iterator<T, Tree> rhs) const
+	
+	bool operator!=(RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this != *rhs));
+		return ((*this->_current != *rhs._current));
 	}
-	bool operator!=(const constant_RBT_iterator<T, Tree> rhs) const
+
+	bool operator!=(constant_RBT_iterator<T, Tree> rhs) const
 	{
-		return ((*this != *rhs));
+		return ((*this->_current != *rhs._current));
 	}
-	T &operator*() const
+	
+	const reference operator*() const
 	{
-		return (this->_current->content);
+		return (*this->_current);
 	}
-	pointer operator->() const
+	
+	const pointer operator->() const
 	{
-		return (&(this->_current->content));
+		return (this->_current);
 	}
 private:
-	pointer _current;
+	pointer	_current;
+	node_pointer _currentnode;
 	Tree *_tree;
 };
+
 }	//namespace ft end
 #endif

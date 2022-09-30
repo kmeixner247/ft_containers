@@ -6,11 +6,10 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/28 00:26:57 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/30 19:43:06 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
 #ifndef RBT_HPP
 #define RBT_HPP
 #include "utils.hpp"
@@ -23,10 +22,10 @@
 namespace ft
 {
 template<typename T>
-class Node
+struct Node
 {
 public:
-	T content;
+	T *content;
 	Node *parent;
 	Node *lc;
 	Node *rc;
@@ -41,10 +40,12 @@ public:
 	typedef Compare key_compare;
 	typedef Alloc allocator_type;
 	typedef Node<T>* node_pointer;
+	typedef RBT<value_type, key_compare, allocator_type> tree_type;
 	typedef typename allocator_type::reference reference;
 	typedef typename allocator_type::const_reference const_reference;
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
+	typedef typename ft::RBT_iterator<value_type, tree_type> iterator;
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
 	
@@ -53,6 +54,8 @@ public:
 		this->_compare = comp;
 		this->_allocator = alloc;
 		this->_end = this->_nodealloc.allocate(1);
+		this->_end->content = this->_allocator.allocate(1);
+		this->_allocator.construct(this->_end->content);
 		this->_end->colour = BLACK;
 		this->_end->lc = NULL;
 		this->_end->rc = NULL;
@@ -61,19 +64,25 @@ public:
 
 	RBT (const RBT &rhs)
 	{
-		
+		this->_compare = rhs._compare;
+		this->_allocator = rhs._allocator;
+		this->_end = this->_nodealloc.allocate(1);
+		this->_end->content = NULL;
+		this->_end->colour = BLACK;
+		this->_end->lc = NULL;
+		this->_end->rc = NULL;
+		this->_root = this->_end;
+		iterator it = rhs.begin();
+		while (it != rhs.end())
+			this->insert(*(it++));
 	}
 	
 	~RBT()
 	{
-		this->_nodealloc.deallocate(this->_end, 1);
-	}
-	void print_tree()
-	{
-		std::cout << this->_root->content << std::endl;
+		this->clear();
 	}
 
-	size_type size()
+	size_type size() const
 	{
 		size_type n = 0;
 		node_pointer temp = this->minimum(this->_root);
@@ -85,45 +94,61 @@ public:
 		return (n);
 	}
 
-	node_pointer get_end()
+	node_pointer getRoot() const
+	{
+		return (this->_root);
+	}
+	
+	node_pointer getEnd()
 	{
 		return (this->_end);
 	}
 
-	node_pointer find_node(value_type val)
+	// node_pointer find_node(value_type val)
+	// {
+	// 	node_pointer current = this->_root;
+	// 	while (current)
+	// 	{
+			
+	// 	}
+	// }	
+
+	node_pointer find_node(value_type val) const
 	{
 		node_pointer current = this->_root;
 		if (current == this->_end)
-			return (NULL);
+			return (this->_end);
 		while (current)
 		{
-			if (current->content == val)
+			if (get_key(&val) == get_key(current->content))
 				return (current);
-			else if (this->_compare(get_key(val), get_key(current->content)))
+			else if (this->_compare(get_key(&val), get_key(current->content)))
 			{
 				if (current->lc)
 					current = current->lc;
 				else
-					return (NULL);
+					return (this->_end);
 			}
 			else
 			{
 				if (current->rc)
 					current = current->rc;
 				else
-					return (NULL);
+					return (this->_end);
 			}
 		}
-		return (NULL);
+		return (this->_end);
 	}
 
 	node_pointer insert(value_type val)
 	{
-		if (find_node(val))
-			return (NULL);
+		node_pointer temp123 = find_node(val);
+		if (temp123 != this->_end)
+			return (temp123);
 		node_pointer newnode = this->_nodealloc.allocate(1);
 		node_pointer org = newnode;
-		this->_allocator.construct(&newnode->content, val);
+		newnode->content = this->_allocator.allocate(1);
+		this->_allocator.construct(newnode->content, val);
 		newnode->parent = NULL;
 		newnode->lc = NULL;
 		newnode->rc = NULL;
@@ -182,12 +207,7 @@ public:
 		printBT("", node, false);
 	}
 
-	node_pointer getRoot()
-	{
-		return (this->_root);
-	}
-
-	node_pointer successor(node_pointer node)
+	node_pointer successor(node_pointer node) const
 	{
 		if (node == this->maximum(this->_root))
 			return (this->_end);
@@ -202,7 +222,7 @@ public:
 		return (temp);
 	}
 
-	node_pointer predecessor(node_pointer node)
+	node_pointer predecessor(node_pointer node) const
 	{
 		if (node == this->_end)
 			return (this->maximum(this->_root));
@@ -217,38 +237,47 @@ public:
 		return (temp);
 	}
 
-	node_pointer minimum(node_pointer node)
+	node_pointer minimum(node_pointer node) const
 	{
+		node_pointer temp;
+		temp = node;
 		if (!_root)
-			return (NULL);
-		while (node->lc)
-			node = node->lc;
-		return (node);
+			return (this->_end);
+		while (temp->lc)
+			temp = temp->lc;
+		return (temp);
 	}
 
-	node_pointer maximum(node_pointer node)
+	node_pointer maximum(node_pointer node) const
 	{
+		node_pointer temp;
+		temp = node;
 		if (!_root)
-			return (NULL);
-		while (node->rc)
-			node = node->rc;
-		return (node);
+			return (this->_end);
+		while (temp->rc)
+			temp = temp->rc;
+		return (temp);
 	}
 
-	void delete_by_value(value_type val)
+	size_type delete_by_key(value_type val)
 	{
-		delete_node(bst_deletion(find_node(val)));
+		return (delete_and_fix(find_node_to_delete(find_node(get_key(val)))));
+		// return(delete_and_fix(find_node_to_delete(fine_and_fix(val))));
 	}
 
-	void delete_node(node_pointer node)
+	size_type delete_and_fix(node_pointer node)
 	{
 		node_pointer temp = NULL;
 		node_pointer sibling;
 		node_pointer org;
+		
 		if (!node)
-			return ;
+			return (0);
 		if (this->size() == 1)
 		{
+			
+			this->_allocator.destroy(this->_root->content);
+			this->_allocator.deallocate(this->_root->content, 1);
 			this->_nodealloc.deallocate(this->_root, 1);
 			this->_root = this->_end;
 		}
@@ -262,7 +291,9 @@ public:
 			if (node == node->parent->lc)
 				node->parent->lc = NULL;
 			else
-				node->parent->rc = NULL;
+				node->parent->rc = NULL;			
+			this->_allocator.destroy(node->content);
+			this->_allocator.deallocate(node->content, 1);
 			this->_nodealloc.deallocate(node, 1);
 		}
 		else if (((temp = node->lc) && node->lc->colour == RED) || ((temp = node->rc) && node->rc->colour == RED))
@@ -272,6 +303,8 @@ public:
 			node->parent->colour = BLACK;
 			node->parent->lc = NULL;
 			node->parent->rc = NULL;
+			this->_allocator.destroy(node->content);
+			this->_allocator.deallocate(node->content, 1);
 			this->_nodealloc.deallocate(node, 1);
 		}
 		else	//NODE BLACK AND NO RED CHILD: MANY OPTIONS
@@ -367,16 +400,44 @@ public:
 				else
 					org->parent->rc = NULL;
 			}
+			this->_allocator.destroy(org->content);
+			this->_allocator.deallocate(org->content, 1);
 			this->_nodealloc.deallocate(org, 1);
 			// delete org;
 		}
+		return (1);
 	}
+
+	void clear()
+	{
+		this->clear_subtree(this->_root);
+		this->_root = this->_end;
+	}
+
 private:
 	node_pointer _root;
 	node_pointer _end;
 	allocator_type _allocator;
 	key_compare _compare;
 	std::allocator<Node<T> > _nodealloc;
+
+	void clear_subtree(node_pointer node)
+	{
+		if (!node || node == this->_end)
+			return ;
+		if (node->lc)
+			clear_subtree(node->lc);
+		if (node->rc)
+			clear_subtree(node->rc);
+		delete_node(node);
+	}
+
+	void delete_node(node_pointer node)
+	{
+		this->_allocator.destroy(node->content);
+		this->_allocator.deallocate(node->content, 1);
+		this->_nodealloc.deallocate(node, 1);
+	}
 
 	void printBT(const std::string &prefix, const node_pointer node, bool isLeft)
 	{
@@ -385,14 +446,14 @@ private:
 			std::cout << prefix;
 			std::cout << (isLeft ? "├──" : "└──" );
 			std::cout << (node->colour == RED ? "\x1B[31m" : "");
-			std::cout << node->content.first << std::endl;
+			std::cout << node->content->first << std::endl;
 			std::cout << (node->colour == RED ? "\033[0m" : "");
         	printBT( prefix + (isLeft ? "│   " : "    "), node->lc, true);
         	printBT( prefix + (isLeft ? "│   " : "    "), node->rc, false);
 		}
 	}
 
-	node_pointer bst_deletion(node_pointer node)
+	node_pointer find_node_to_delete(node_pointer node)
 	{
 		node_pointer temp = node;
 		while (node && node->rc && node->lc)
@@ -406,10 +467,11 @@ private:
 
 	void swap_nodes(node_pointer node, node_pointer other)
 	{
-		int temp;
-		temp = node->content;
-		node->content = other->content;
-		other->content = temp;
+		// value_type temp(node->content);
+		// node->content = other->content;
+		// other->content = temp;
+		this->_allocator.destroy(node->content);
+		this->_allocator.construct(node->content, *(other->content));
 	}
 
 	void bst_insertion(node_pointer node)
@@ -481,11 +543,6 @@ private:
 			node->parent->lc = temp;
 		temp->rc = node;
 		node->parent = temp;
-	}
-	void clear()
-	{
-		// temp = 0;
-		//CLEAR EVERYTHING
 	}
 	
 };

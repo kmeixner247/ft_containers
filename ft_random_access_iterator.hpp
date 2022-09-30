@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/24 22:24:20 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/22 00:53:05 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/09/28 17:26:47 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define FT_RANDOM_ACCESS_ITERATOR_HPP
 #include "ft_iterator.hpp"
 #include "utils.hpp"
-#include <iterator>
+// #include <iterator>
 namespace ft
 {
 template<typename T>
@@ -318,7 +318,6 @@ typedef typename ft::iterator<random_access_iterator_tag, T>::iterator_category 
 	{
 		return (*(this->_current + n));
 	}
-	
 private:
 	pointer _current;
 };
