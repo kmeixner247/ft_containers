@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/27 11:15:00 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 16:10:33 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 18:05:10 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,16 +48,25 @@ public:
 		return (this->_currentnode);
 	}
 
-	Tree getTree() const
+	Tree *getTree() const
 	{
 		return (this->_tree);
 	}
 
+	template<typename OtherTree>
+	RBT_iterator &operator=(RBT_iterator<T, OtherTree> const &rhs)
+	{
+		this->_current = rhs.base();
+		this->_currentnode = rhs.getNodeptr();
+		this->_tree = reinterpret_cast<Tree *>(rhs.getTree());
+		return (*this);
+	}
+	
 	RBT_iterator &operator=(RBT_iterator<T, Tree> const &rhs)
 	{
-		this->_current = rhs._current;
-		this->_currentnode = rhs._currentnode;
-		this->_tree = rhs._tree;
+		this->_current = rhs.base();
+		this->_currentnode = rhs.getNodeptr();
+		this->_tree = rhs.getTree();
 		return (*this);
 	}
 	

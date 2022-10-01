@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 16:08:02 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 18:09:23 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,16 +102,13 @@ public:
 	*/
 	iterator begin()
 	{
-		iterator temp(this->_tree.minimum(this->_tree.getRoot()), &this->_tree);
-		return (temp);
+		return(iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
 		// return (iterator(this->_tree.minimum(this->_tree.getRoot()), &(this->_tree)));
 	}
 
 	const_iterator begin() const
 	{
-		const_iterator temp;
-		temp = const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree);
-		return (temp);
+		return(const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
 	}
 
 	iterator end()
@@ -137,14 +134,15 @@ public:
 	// {}
 
 
-	// const_iterator cbegin() const
-	// {
-	// 	const_iterator temp(iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree), &this->_tree);
-	// 	return (temp);
-	// }
+	const_iterator cbegin() const
+	{
+		return(const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
+	}
 
-	// const_iterator cend() const
-	// {}
+	const_iterator cend() const
+	{
+		return(const_iterator(this->_tree.getEnd(), &this->_tree));
+	}
 
 	// const_reverse_iterator crbegin() const
 	// {}
@@ -177,7 +175,7 @@ public:
 
 	mapped_type& operator[] (const key_type& k)
 	{
-		 return((*((this->insert(make_pair(k,mapped_type()))).first)).second);
+		 return((*((this->insert(ft::make_pair(k,mapped_type()))).first)).second);
 	}
 
 	mapped_type& at (const key_type& k)
@@ -284,7 +282,7 @@ public:
 	{
 		// (void)k;
 		iterator it = this->begin();
-		while (this->_comp(it->first, k))
+		while (it != this->end() && this->_comp(it->first, k))
 			it++;
 		return (it);
 	}
@@ -292,35 +290,43 @@ public:
 	const_iterator lower_bound (const key_type& k) const
 	{
 		const_iterator it = this->begin();
-		while (this->_comp(it->first, k))
+		while (it != this->end() && this->_comp(it->first, k))
 			it++;
 		return (it);
 	}
 
 	iterator upper_bound (const key_type& k)
 	{
-		(void)k;
-		return (iterator());
+		iterator it = this->begin();
+		while (it != this->end() && !(this->_comp(k, it->first)))
+			it++;
+		return (it);
 	}
 	
 	const_iterator upper_bound (const key_type& k) const
 	{
-		(void)k;
-		return (const_iterator());
+		iterator it = this->begin();
+		while (it != this->end() && !(this->_comp(k, it->first)))
+			it++;
+		return (it);
+	}
+
+	pair<iterator,iterator> equal_range (const key_type& k)
+	{
+		iterator it = this->begin();
+		while (it != this->end() && this->_comp(k, it->first))
+			it++;
+		return (ft::make_pair<iterator, iterator>(it, it));
 	}
 
 	pair<const_iterator,const_iterator> equal_range (const key_type& k) const
 	{
-		(void)k;
-		return (ft::make_pair<const_iterator, const_iterator>(const_iterator(), const_iterator()));
+		const_iterator it = this->cbegin();
+		while (it != this->cend() && this->_comp(k, it->first))
+			it++;
+		return (ft::make_pair<const_iterator, const_iterator>(it, it));
 	}
 	
-	pair<iterator,iterator> equal_range (const key_type& k)
-	{
-		(void)k;
-		return (ft::make_pair<iterator,iterator>(iterator(), iterator()));
-	}
-
 	/*	
 		ALLOCATOR
 	*/

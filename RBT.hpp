@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 15:54:25 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 17:38:05 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ public:
 	
 	RBT &operator=(const RBT &rhs)
 	{
-		this->_compare = rhs._compare;
+		this->_compare = rhs.getCompare();
 		this->_allocator = rhs._allocator;
 		this->_end = this->_nodealloc.allocate(1);
 		this->_end->content = this->_allocator.allocate(1);
@@ -99,7 +99,12 @@ public:
 		}
 		return (*this);
 	}
-		
+
+	key_compare getCompare() const
+	{
+		return (this->_compare);
+	}
+	
 	void copy_rec(node_pointer node, node_pointer rhsnode)
 	{
 		if (rhsnode->lc)
