@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/30 20:05:07 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 15:01:23 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ public:
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
 	
-	class value_compare : binary_function<value_type,value_type,bool>
+	class value_compare : std::binary_function<value_type,value_type,bool>
 	{ // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
 		friend class map;
 	protected:
@@ -61,13 +61,13 @@ public:
 
 	//Default / empty container constructor
 	// explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : c(comp), mem_alloc(alloc)
-	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp)
+	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp), _allocator(alloc)
 	{
 	}
 
 	//Range constructor
 	template <class InputIterator>
-	map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp)
+	map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp), _allocator(alloc)
 	{
 		while (first != last)
 			this->_tree.insert(*(first++));
@@ -83,13 +83,14 @@ public:
 	~map()
 	{}
 
-	// map &operator=(const map &rhs)
-	// {
-	// 	this->clear();
-	// 	for (const_iterator it = rhs.cbegin(); it != rhs.end(); it++)
-	// 		this->insert(*it);
-	// 	return (*this);
-	// }
+	map &operator=(const map &rhs)
+	{
+		this->_allocator = rhs._allocator;
+		this->_comp = rhs._comp;
+		this->clear();
+		this->_tree = rhs._tree;
+		return (*this);
+	}
 // ft::map<int, int, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > >::const_iterator
 // ft::map<int, int, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > >::iterator
 
@@ -167,7 +168,7 @@ public:
 
 	size_type max_size() const
 	{
-		return (0);
+		return (this->_allocator.max_size());
 	}
 
 	/*	
@@ -206,7 +207,7 @@ public:
 	//Single element insert with hint (???)
 	iterator insert (iterator position, const value_type& val)
 	{
-		insert(val);
+		return (insert(val).first);
 	}
 
 	//Range insert
@@ -214,12 +215,12 @@ public:
 	void insert (InputIterator first, InputIterator last)
 	{
 		while (first != last)
-			this->_tree->insert(*(first++));
+			this->_tree.insert(*(first++));
 	}
 
 	void erase (iterator position)
 	{
-		this->_tree.delete_node(position.getNodeptr());
+		this->_tree.delete_by_iterator(position);
 	}
 	
 	size_type erase (const key_type& k)
@@ -232,13 +233,14 @@ public:
 	
 	void erase (iterator first, iterator last)
 	{
-		(void)first;
-		(void)last;
+		
 	}
 
 	void swap (map& x)
 	{
-		(void)x;
+		map temp = x;
+		x = *this;
+		*this = x;
 	}
 
 	void clear()
@@ -271,11 +273,12 @@ public:
 		// 		break;
 		// return (it);
 	}
-	
+
 	const_iterator find (const key_type& k) const
 	{
 		value_type lol = ft::make_pair<key_type, mapped_type>(k, mapped_type());
-		return (const_iterator(this->_tree.find_node(lol), &this->_tree));
+		return (const_iterator(iterator(this->_tree.find_node(lol), &this->_tree)));
+
 		// const_iterator it = this->begin();
 		// for (; it != this->end(); it++)
 		// 	if ((*it).first == k)
@@ -339,6 +342,7 @@ public:
 private:
 	ft::RBT<value_type, key_compare, allocator_type> _tree;
 	key_compare _comp;
+	allocator_type _allocator;
 	
 };
 

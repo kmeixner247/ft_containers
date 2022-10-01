@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/30 19:43:06 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 14:24:12 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ public:
 		this->_end->content = this->_allocator.allocate(1);
 		this->_allocator.construct(this->_end->content);
 		this->_end->colour = BLACK;
+		this->_end->parent = NULL;
 		this->_end->lc = NULL;
 		this->_end->rc = NULL;
 		this->_root = this->_end;
@@ -64,42 +65,94 @@ public:
 
 	RBT (const RBT &rhs)
 	{
-		this->_compare = rhs._compare;
-		this->_allocator = rhs._allocator;
-		this->_end = this->_nodealloc.allocate(1);
-		this->_end->content = NULL;
-		this->_end->colour = BLACK;
-		this->_end->lc = NULL;
-		this->_end->rc = NULL;
-		this->_root = this->_end;
-		iterator it = rhs.begin();
-		while (it != rhs.end())
-			this->insert(*(it++));
+		*this = rhs;
 	}
 	
 	~RBT()
 	{
 		this->clear();
 	}
-
+	
+	RBT &operator=(const RBT &rhs)
+	{
+		this->_compare = rhs._compare;
+		this->_allocator = rhs._allocator;
+		this->_end = this->_nodealloc.allocate(1);
+		this->_end->content = this->_allocator.allocate(1);
+		this->_allocator.construct(this->_end->content);
+		this->_end->colour = BLACK;
+		this->_end->parent = NULL;
+		this->_end->lc = NULL;
+		this->_end->rc = NULL;
+		if (rhs.getRoot() == rhs.getEnd())
+			this->_root = this->_end;
+		else
+		{
+			this->_root = this->_nodealloc.allocate(1);
+			this->_root->parent = NULL;
+			this->_root->lc = NULL;
+			this->_root->rc = NULL;
+			this->_root->colour = BLACK;
+			this->_root->content = this->_allocator.allocate(1);
+			this->_allocator.construct(this->_root->content, *(rhs.getRoot()->content));
+			this->copy_rec(this->_root, rhs.getRoot());
+		}
+		return (*this);
+	}
+		
+	void copy_rec(node_pointer node, node_pointer rhsnode)
+	{
+		if (rhsnode->lc)
+		{
+			node->lc = this->_nodealloc.allocate(1);
+			node->lc->parent = node;
+			node->lc->lc = NULL;
+			node->lc->rc = NULL;
+			node->lc->colour = rhsnode->lc->colour;
+			node->lc->content = this->_allocator.allocate(1);
+			this->_allocator.construct(node->lc->content, *(rhsnode->lc->content));
+			copy_rec(node->lc, rhsnode->lc);
+		}
+		if (rhsnode->rc)
+		{
+			node->rc = this->_nodealloc.allocate(1);
+			node->rc->parent = node;
+			node->rc->lc = NULL;
+			node->rc->rc = NULL;
+			node->rc->colour = rhsnode->rc->colour;
+			node->rc->content = this->_allocator.allocate(1);
+			this->_allocator.construct(node->rc->content, *(rhsnode->rc->content));
+			copy_rec(node->rc, rhsnode->rc);
+		}
+	}
+	
 	size_type size() const
 	{
-		size_type n = 0;
-		node_pointer temp = this->minimum(this->_root);
-		while (temp != this->_end)
-		{
-			n++;
-			temp = this->successor(temp);
-		}
-		return (n);
+		size_type count = 0;
+		if (this->_root == this->_end)
+			return (0);
+		size_rec(this->_root, &count);
+		return (count);
 	}
+
+	// size_type size() const
+	// {
+	// 	size_type n = 0;
+	// 	node_pointer temp = this->minimum(this->_root);
+	// 	while (temp != this->_end)
+	// 	{
+	// 		n++;
+	// 		temp = this->successor(temp);
+	// 	}
+	// 	return (n);
+	// }
 
 	node_pointer getRoot() const
 	{
 		return (this->_root);
 	}
 	
-	node_pointer getEnd()
+	node_pointer getEnd() const
 	{
 		return (this->_end);
 	}
@@ -258,11 +311,16 @@ public:
 			temp = temp->rc;
 		return (temp);
 	}
-
-	size_type delete_by_key(value_type val)
+	
+	size_type delete_by_val(value_type val)
 	{
-		return (delete_and_fix(find_node_to_delete(find_node(get_key(val)))));
-		// return(delete_and_fix(find_node_to_delete(fine_and_fix(val))));
+		return (delete_and_fix(find_node_to_delete(find_node(val))));
+	}
+
+	size_type delete_by_iterator(iterator it)
+	{
+		return (delete_and_fix(find_node_to_delete(it.getNodeptr())));
+		// return(delete_by_val(*it));
 	}
 
 	size_type delete_and_fix(node_pointer node)
@@ -275,7 +333,6 @@ public:
 			return (0);
 		if (this->size() == 1)
 		{
-			
 			this->_allocator.destroy(this->_root->content);
 			this->_allocator.deallocate(this->_root->content, 1);
 			this->_nodealloc.deallocate(this->_root, 1);
@@ -420,6 +477,15 @@ private:
 	allocator_type _allocator;
 	key_compare _compare;
 	std::allocator<Node<T> > _nodealloc;
+
+	void size_rec(node_pointer node, size_type *count) const
+	{
+		(*count)++;
+		if (node->lc)
+			size_rec(node->lc, count);
+		if (node->rc)
+			size_rec(node->rc, count);
+	}
 
 	void clear_subtree(node_pointer node)
 	{

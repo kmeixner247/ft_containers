@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/27 11:15:00 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/30 20:04:27 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 14:58:58 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,11 @@ public:
 		return (this->_currentnode);
 	}
 
+	Tree getTree() const
+	{
+		return (this->_tree);
+	}
+
 	RBT_iterator &operator=(RBT_iterator<T, Tree> const &rhs)
 	{
 		this->_current = rhs._current;
@@ -75,15 +80,15 @@ public:
 	RBT_iterator &operator--()
 	{
 		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = &this->_currentnode->content;
-		returm (*this);
+		this->_current = this->_currentnode->content;
+		return (*this);
 	}
 	
 	RBT_iterator operator--(int)
 	{
 		RBT_iterator temp(*this);
 		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = &this->_currentnode->content;
+		this->_current = this->_currentnode->content;
 		return (temp);
 	}
 	
@@ -139,10 +144,8 @@ private:
 public:
 	constant_RBT_iterator() : _current(0), _currentnode(0), _tree(0) {}
 	constant_RBT_iterator(constant_RBT_iterator const &rhs) : _current(rhs._current), _currentnode(rhs._currentnode), _tree(rhs._tree) {}
-	constant_RBT_iterator(RBT_iterator<T, Tree> const &rhs)
-	{
-		*this = rhs;
-	};
+	template<typename X, typename XTree>
+	constant_RBT_iterator(RBT_iterator<X, XTree> const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(rhs.getTree()) {}
 	constant_RBT_iterator(node_pointer p, Tree *tree) : _current(&p->content), _currentnode(p), _tree(tree) {}
 	const pointer base() const
 	{
