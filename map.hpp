@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 15:01:23 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 16:08:02 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,31 +264,17 @@ public:
 	*/
 	iterator find (const key_type& k)
 	{
-		value_type lol = ft::make_pair<key_type, mapped_type>(k, mapped_type());
-		return (iterator(this->_tree.find_node(lol), &this->_tree));
-
-		// iterator it = this->begin();
-		// for (; it != this->end(); it++)
-		// 	if ((*it).first == k)
-		// 		break;
-		// return (it);
+		return (iterator(this->_tree.template find_node<key_type>(k), &this->_tree));
 	}
 
 	const_iterator find (const key_type& k) const
 	{
-		value_type lol = ft::make_pair<key_type, mapped_type>(k, mapped_type());
-		return (const_iterator(iterator(this->_tree.find_node(lol), &this->_tree)));
-
-		// const_iterator it = this->begin();
-		// for (; it != this->end(); it++)
-		// 	if ((*it).first == k)
-		// 		break;
-		// return (const_iterator());
+		return (const_iterator(this->_tree.template find_node<const key_type>(k), &this->_tree));
 	}	
 
-	size_type count (const key_type& k) const
+	size_type count (const key_type& k)
 	{
-		if (find(k) == this->end())
+		if (this->find(k) == this->end())
 			return (0);
 		else
 			return (1);
@@ -296,14 +282,19 @@ public:
 
 	iterator lower_bound (const key_type& k)
 	{
-		(void)k;
-		return (iterator());
+		// (void)k;
+		iterator it = this->begin();
+		while (this->_comp(it->first, k))
+			it++;
+		return (it);
 	}
 	
 	const_iterator lower_bound (const key_type& k) const
 	{
-		(void)k;
-		return (const_iterator());
+		const_iterator it = this->begin();
+		while (this->_comp(it->first, k))
+			it++;
+		return (it);
 	}
 
 	iterator upper_bound (const key_type& k)

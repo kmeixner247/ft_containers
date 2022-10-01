@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 14:24:12 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 15:54:25 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,6 +165,32 @@ public:
 			
 	// 	}
 	// }	
+
+	template<typename Key>
+	node_pointer find_node(Key k) const
+	{
+		node_pointer current = this->_root;
+		if (current == this->_end)
+			return (this->_end);
+		while (current)
+		if (k == get_key(current->content))
+			return (current);
+		else if (this->_compare(k, get_key(current->content)))
+		{
+			if (current->lc)
+				current = current->lc;
+			else
+				return (this->_end);
+		}
+		else
+		{
+			if (current->rc)
+				current = current->rc;
+			else
+				return (this->_end);
+		}
+		return (this->_end);
+	}
 
 	node_pointer find_node(value_type val) const
 	{

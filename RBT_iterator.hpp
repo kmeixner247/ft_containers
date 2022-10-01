@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/27 11:15:00 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 14:58:58 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 16:10:33 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,8 +144,7 @@ private:
 public:
 	constant_RBT_iterator() : _current(0), _currentnode(0), _tree(0) {}
 	constant_RBT_iterator(constant_RBT_iterator const &rhs) : _current(rhs._current), _currentnode(rhs._currentnode), _tree(rhs._tree) {}
-	template<typename X, typename XTree>
-	constant_RBT_iterator(RBT_iterator<X, XTree> const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(rhs.getTree()) {}
+	constant_RBT_iterator(RBT_iterator<T, Tree> const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(rhs.getTree()) {}
 	constant_RBT_iterator(node_pointer p, Tree *tree) : _current(&p->content), _currentnode(p), _tree(tree) {}
 	const pointer base() const
 	{
