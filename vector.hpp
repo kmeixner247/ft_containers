@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/09/27 12:10:11 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/01 15:12:20 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,7 +291,10 @@ public:
 		this->insert(this->_end, val);
 	}
 	
-	
+	void pop_back()
+	{
+		this->erase(this->_end - 1);
+	}
 	// insert single
 	iterator insert (iterator position, const value_type& val)
 	{
@@ -363,7 +366,7 @@ public:
 				}
 				this->_allocator.destroy(new_end);
 				this->_allocator.deallocate(new_start, new_capacity);
-				throw "test";
+				throw ;
 			}
 			this->_allocator.deallocate(this->_start, this->_capacity);
 			this->_start = new_start;
