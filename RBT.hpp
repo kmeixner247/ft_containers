@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 17:38:05 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/02 13:08:37 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,24 +70,18 @@ public:
 	
 	~RBT()
 	{
-		this->clear();
+		// this->clear();
 	}
 	
 	RBT &operator=(const RBT &rhs)
 	{
+		this->clear();
 		this->_compare = rhs.getCompare();
 		this->_allocator = rhs._allocator;
-		this->_end = this->_nodealloc.allocate(1);
-		this->_end->content = this->_allocator.allocate(1);
-		this->_allocator.construct(this->_end->content);
-		this->_end->colour = BLACK;
-		this->_end->parent = NULL;
-		this->_end->lc = NULL;
-		this->_end->rc = NULL;
-		if (rhs.getRoot() == rhs.getEnd())
-			this->_root = this->_end;
-		else
+		if (rhs.getRoot() != rhs.getEnd())
 		{
+			// this->_root = this->_end;
+		// else
 			this->_root = this->_nodealloc.allocate(1);
 			this->_root->parent = NULL;
 			this->_root->lc = NULL;
@@ -502,6 +496,12 @@ public:
 		this->_root = this->_end;
 	}
 
+	void deleteEnd()
+	{
+		this->_allocator.destroy(this->_end->content);
+		this->_allocator.deallocate(this->_end->content, 1);
+		this->_nodealloc.deallocate(this->_end, 1);
+	}
 private:
 	node_pointer _root;
 	node_pointer _end;

@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 18:09:23 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/02 13:26:47 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ public:
 	//iterators
 	typedef typename ft::RBT_iterator<value_type, tree_type> iterator;
 	typedef typename ft::constant_RBT_iterator<const value_type, tree_type> const_iterator;
+	typedef typename ft::reverse_iterator<iterator> reverse_iterator;
+	typedef typename ft::reverse_iterator<const_iterator> const_reverse_iterator;
+	
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
 	
@@ -81,7 +84,10 @@ public:
 
 	//Destructor
 	~map()
-	{}
+	{
+		this->_tree.clear();
+		this->_tree.deleteEnd();
+	}
 
 	map &operator=(const map &rhs)
 	{
@@ -121,34 +127,29 @@ public:
 		return(const_iterator(this->_tree.getEnd(), &this->_tree));
 	}
 
-	// reverse_iterator rbegin()
-	// {}
-	
-	// const_reverse_iterator rbegin() const
-	// {}
-	
-	// reverse_iterator rend()
-	// {}
-	
-	// const_reverse_iterator rend() const
-	// {}
-
-
-	const_iterator cbegin() const
+	reverse_iterator rbegin()
 	{
-		return(const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
+		reverse_iterator temp(this->end());
+		return (temp);
 	}
-
-	const_iterator cend() const
+	
+	const_reverse_iterator rbegin() const
 	{
-		return(const_iterator(this->_tree.getEnd(), &this->_tree));
+		const_reverse_iterator temp(this->end());
+		return (temp);
 	}
-
-	// const_reverse_iterator crbegin() const
-	// {}
-
-	// const_reverse_iterator crend() const
-	// {}
+	
+	reverse_iterator rend()
+	{
+		reverse_iterator temp(this->begin());
+		return (temp);
+	}
+	
+	const_reverse_iterator rend() const
+	{
+		const_reverse_iterator temp(this->begin());
+		return (temp);
+	}
 
 	/*	
 		CAPACITY RELATED MEMBER FUNCTIONS
@@ -236,9 +237,9 @@ public:
 
 	void swap (map& x)
 	{
-		map temp = x;
-		x = *this;
+		map temp = *this;
 		*this = x;
+		x = temp;
 	}
 
 	void clear()
@@ -313,16 +314,22 @@ public:
 
 	pair<iterator,iterator> equal_range (const key_type& k)
 	{
-		iterator it = this->begin();
-		while (it != this->end() && this->_comp(k, it->first))
+		iterator it = this->find(k);
+		if (it != this->end())
+			return (ft::make_pair<iterator, iterator>(it, ++it));
+		it = this->begin();
+		while (it != this->end() && this->_comp(it->first, k))
 			it++;
 		return (ft::make_pair<iterator, iterator>(it, it));
 	}
 
 	pair<const_iterator,const_iterator> equal_range (const key_type& k) const
 	{
-		const_iterator it = this->cbegin();
-		while (it != this->cend() && this->_comp(k, it->first))
+		const_iterator it = this->find(k);
+		if (it != this->end())
+			return (ft::make_pair<const_iterator, const_iterator>(it, ++it));
+		it = this->begin();
+		while (it != this->end() && this->_comp(it->first, k))
 			it++;
 		return (ft::make_pair<const_iterator, const_iterator>(it, it));
 	}
@@ -384,10 +391,17 @@ bool operator>= (  map<Key,T,Compare,Alloc>& lhs,  map<Key,T,Compare,Alloc>& rhs
 	return (!(lhs < rhs));
 }
 
-// //swap
-// template <class Key, class T, class Compare, class Alloc>
-// void swap (map<Key,T,Compare,Alloc>& x, map<Key,T,Compare,Alloc>& y)
-// {}
+}	//end of namespace ft
 
+//swap
+namespace std
+{
+	template <class Key, class T, class Compare, class Alloc>
+	void swap (ft::map<Key,T,Compare,Alloc>& x, ft::map<Key,T,Compare,Alloc>& y)
+	{
+		x.swap(y);
+	}
 }
 #endif
+
+

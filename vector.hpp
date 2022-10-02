@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/01 15:12:20 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/02 13:16:06 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,13 +132,13 @@ public:
 	
 	const_reverse_iterator rbegin() const
 	{
-		reverse_iterator temp(this->_end);
+		const_reverse_iterator temp(this->_end);
 		return (temp);
 	}
 
 	const_reverse_iterator rend() const
 	{
-		reverse_iterator temp(this->_start); 
+		const_reverse_iterator temp(this->_start); 
 		return (temp);
 	}
 	/* 
