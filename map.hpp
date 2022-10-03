@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/02 13:26:47 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/03 01:00:42 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,7 @@ public:
 	template <class InputIterator>
 	map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp), _allocator(alloc)
 	{
-		while (first != last)
-			this->_tree.insert(*(first++));
+		this->insert(first, last);
 	}
 
 	//Copy constructor
@@ -97,11 +96,6 @@ public:
 		this->_tree = rhs._tree;
 		return (*this);
 	}
-// ft::map<int, int, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > >::const_iterator
-// ft::map<int, int, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > >::iterator
-
-// constant_RBT_iterator<const pair<const int, int>, RBT<pair<const int, int>, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > > >
-// RBT_iterator<pair<const int, int>, RBT<pair<const int, int>, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > > >')
 
 	/*	
 		ITERATOR RELATED MEMBER FUNCTIONS
@@ -109,22 +103,25 @@ public:
 	iterator begin()
 	{
 		return(iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
-		// return (iterator(this->_tree.minimum(this->_tree.getRoot()), &(this->_tree)));
+		// return (this->_tree.begin());
 	}
 
 	const_iterator begin() const
 	{
 		return(const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
+		// return (this->_tree.begin());
 	}
 
 	iterator end()
 	{
-		return(iterator(this->_tree.getEnd(), &this->_tree));
+		// return(iterator(this->_tree.getEnd(), &this->_tree));
+		return (this->_tree.end());
 	}
 	
 	const_iterator end() const
 	{
-		return(const_iterator(this->_tree.getEnd(), &this->_tree));
+		// return(const_iterator(this->_tree.getEnd(), &this->_tree));
+		return (this->_tree.end());
 	}
 
 	reverse_iterator rbegin()
@@ -206,6 +203,7 @@ public:
 	//Single element insert with hint (???)
 	iterator insert (iterator position, const value_type& val)
 	{
+		(void)position;
 		return (insert(val).first);
 	}
 
@@ -219,20 +217,19 @@ public:
 
 	void erase (iterator position)
 	{
-		this->_tree.delete_by_iterator(position);
+		this->_tree.erase(*position);
 	}
 	
 	size_type erase (const key_type& k)
 	{
-		// std::cout << "hello" << std::endl;
-		// return (this->_tree.delete_by_key(k));
-		(void)k;
-		return (0);
+		return(this->_tree.erase(k));
 	}
 	
 	void erase (iterator first, iterator last)
 	{
-		
+		map<key_type, mapped_type> temp(first, last);
+		for (iterator it = temp.begin(); it != temp.end(); it++)
+			this->erase(it->first);
 	}
 
 	void swap (map& x)

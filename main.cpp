@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/02 12:29:18 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/03 19:42:56 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #define _map ft::map
 #define _make_pair ft::make_pair
 #define _pair ft::pair
+# include <sys/time.h>
+typedef struct timeval	t_timeval;
 
 template <class T, class V, class C>
 void fillMap(std::map<T, V, C> &mp) {
@@ -104,7 +106,16 @@ void compare_print_vectors(std::vector<T> std, std::vector<T> ft)
 	}
 	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
 }
+int	gettime(t_timeval start)
+{
+	t_timeval	tv;
+	int			tdiff;
 
+	gettimeofday(&tv, NULL);
+	tdiff = (tv.tv_sec - start.tv_sec) * 1000;
+	tdiff += (tv.tv_usec - start.tv_usec) / 1000;
+	return (tdiff);
+}
 int main()
 {   
 	{
@@ -209,7 +220,6 @@ int main()
 	// }
 	// compare_print_vectors(v2, v);
 	}
-	int _ratio = 5000;
 	// std::vector<int> v;
     // mp.clear();
     // for (int i = 0, j = 0; i < 25 * _ratio; ++i, ++j)
@@ -220,8 +230,6 @@ int main()
     // _map<int, int>::iterator it = mp.begin();
     // if (it == mp.end())
     //     v.push_back(1);
-	std::vector<int> v;
-	std::vector<int> v2;
 
 	// {
 	// 	_map<int, int> mp;
@@ -311,35 +319,100 @@ int main()
 // 	}
 // }
 
+	int _ratio = 1;
+
+t_timeval start;
 {
-	_map<int, int> mp;
-	std::vector<int> v;
-	for (int i = 0, j = 0; i < 25 * _ratio; ++i, ++j)
-		mp.insert(_make_pair(i, j));
-	_map<int, int> mp2;
-	for (int i = 25 * _ratio, j = 0; i < 35 * _ratio; ++i, --j)
-		mp.insert(_make_pair(i, j));
-	long *adr1 = reinterpret_cast<long *>(&mp);
-	long *adr2 = reinterpret_cast<long *>(&mp2);
-	std::cout << "test" << std::endl;
-	mp.swap(mp2);
-	std::cout << "test" << std::endl;
-	if (reinterpret_cast<long *>(&mp) == adr1 && reinterpret_cast<long *>(&mp2) == adr2)
-		v.push_back(1);
-	v.push_back(mp2.size());
-	_map<int, int>::iterator it = mp2.begin();
-	for (; it != mp2.end(); ++it) {
-		v.push_back(it->first);
-		v.push_back(it->second);
-	}
-	std::swap(mp, mp2);
-	_map<int, int>::iterator it2 = mp2.begin();
-	for (; it2 != mp2.end(); ++it2) {
-		v.push_back(it2->first);
-		v.push_back(it2->second);
-	}
+	// gettimeofday(&start, NULL);
+	// std::map<int,int> mp;
+    // v.push_back(mp.erase(3));
+    // for (int i = 0, j = 0; i < 30 * _ratio; ++i, ++j)
+    //     mp.insert(std::make_pair(i, j));
+    // std::map<int, int>::iterator it = mp.begin();
+    // v.push_back(it->first);
+    // v.push_back(mp.erase(-5));
+    // v.push_back(mp.size());
+    // v.push_back(mp.erase(0));
+    // v.push_back(mp.size());
+    // it = mp.begin();
+    // v.push_back(it->first);
+    // std::map<int, int>::iterator it4 = mp.begin();
+    // for (; it4 != mp.end(); it4 = mp.begin()){
+    //     mp.erase(it4->first);}
+    // v.push_back(mp.erase(30 * _ratio - 1));
+    // v.push_back(mp.size());
+    // std::map<int, int> mp2;
+    // for (int i = 0, j = 0; i < 10 ; ++i, ++j)
+    //     mp2.insert(std::make_pair(i, j));
+    // mp2.erase(2);
+    // mp2.erase(7);
+    // std::map<int, int>::iterator it3 = mp2.begin();
+    // for (; it3 != mp2.end(); ++it3) {
+    //     v.push_back(it3->first);
+    //     v.push_back(it3->second);
+    // }
+	// std::cerr << "STD TOOK " << gettime(start) << "ms" << std::endl;
+}
+
+{
+	// gettimeofday(&start, NULL);
+	// _map<int, int>mp;
+    // v2.push_back(mp.erase(3));
+    // for (int i = 0, j = 0; i < 30 * _ratio; ++i, ++j)
+    //     mp.insert(_make_pair(i, j));
+    // _map<int, int>::iterator it = mp.begin();
+    // v2.push_back(it->first);
+    // v2.push_back(mp.erase(-5));
+    // v2.push_back(mp.size());
+    // v2.push_back(mp.erase(0));
+    // v2.push_back(mp.size());
+    // it = mp.begin();
+    // v2.push_back(it->first);
+    // _map<int, int>::iterator it4 = mp.begin();
+	// std::cerr << mp.size() << std::endl;
+    // for (; it4 != mp.end(); it4 = mp.begin())
+    //     mp.erase(it4->first);
+    // v2.push_back(mp.erase(30 * _ratio - 1));
+    // v2.push_back(mp.size());
+    // _map<int, int> mp2;
+    // for (int i = 0, j = 0; i < 10 ; ++i, ++j)
+    //     mp2.insert(_make_pair(i, j));
+    // mp2.erase(2);
+    // mp2.erase(7);
+    // _map<int, int>::iterator it3 = mp2.begin();
+    // for (; it3 != mp2.end(); ++it3) {
+    //     v2.push_back(it3->first);
+    //     v2.push_back(it3->second);
+    // }
+	// std::cerr << "FT TOOK " << gettime(start) << "ms" << std::endl;
+	ft::map<int, int> mp;
+	for (int i = 0; i < 10; i++)
+		mp.insert(ft::make_pair(i, i));
+	ft::map<int, int>::const_iterator it = mp.begin();
+	while (it != mp.end())
+		std::cerr << it++ << std::endl;
 }
 
 
+// {
+// 	std::map<int, int> mp;
+//     for (int i = 0, j = 0; i < 5 * _ratio; ++i, ++j)
+//         mp.insert(std::make_pair(i, j));
+
+//     mp.erase(mp.begin(), --mp.end());
+//     v.push_back(mp.begin()->first);
+// }
+
+// {
+// 	_map<int, int> mp;
+//     for (int i = 0, j = 0; i < 5 * _ratio; ++i, ++j)
+//         mp.insert(_make_pair(i, j));
+//     mp.erase(mp.begin(), --mp.end());
+//     v2.push_back(mp.begin()->first);
+// }
+
+
+
+// compare_print_vectors(v, v2);
 	
 }

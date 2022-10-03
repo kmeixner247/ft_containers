@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/02 13:08:37 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/03 15:27:50 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,17 @@ public:
 	Node *rc;
 	bool colour;
 };
+template<typename T>
+struct ConstNode
+{
+public:
+	ConstNode(Node<T> node) : content(node->content), parent(node->parent), lc(node->lc), rc(node->rc), colour(node->colour) {}
+	T * const content;
+	ConstNode *parent;
+	ConstNode *lc;
+	ConstNode *rc;
+	bool colour;
+};
 
 template<typename T, typename Compare, typename Alloc = std::allocator<T> >
 class RBT
@@ -40,15 +51,21 @@ public:
 	typedef Compare key_compare;
 	typedef Alloc allocator_type;
 	typedef Node<T>* node_pointer;
+	typedef ConstNode<T>* const_node_pointer;
 	typedef RBT<value_type, key_compare, allocator_type> tree_type;
 	typedef typename allocator_type::reference reference;
 	typedef typename allocator_type::const_reference const_reference;
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
 	typedef typename ft::RBT_iterator<value_type, tree_type> iterator;
+	typedef typename ft::constant_RBT_iterator<value_type, tree_type> const_iterator;
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
-	
+	// ft::RBT<ft::pair<const int, foo<int> >, std::__1::less<int>, std::__1::allocator<ft::pair<const int, foo<int> > > >::node_pointer
+	// Node<ft::pair<const int, foo<int> > > *
+	// ft::RBT<ft::pair<const int, foo<int> >, std::__1::less<int>, std::__1::allocator<ft::pair<const int, foo<int> > > >::const_node_pointer
+	// ConstNode<ft::pair<const int, foo<int> > > *
+	  
 	RBT(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 	{
 		this->_compare = comp;
@@ -134,18 +151,6 @@ public:
 		return (count);
 	}
 
-	// size_type size() const
-	// {
-	// 	size_type n = 0;
-	// 	node_pointer temp = this->minimum(this->_root);
-	// 	while (temp != this->_end)
-	// 	{
-	// 		n++;
-	// 		temp = this->successor(temp);
-	// 	}
-	// 	return (n);
-	// }
-
 	node_pointer getRoot() const
 	{
 		return (this->_root);
@@ -155,15 +160,6 @@ public:
 	{
 		return (this->_end);
 	}
-
-	// node_pointer find_node(value_type val)
-	// {
-	// 	node_pointer current = this->_root;
-	// 	while (current)
-	// 	{
-			
-	// 	}
-	// }	
 
 	template<typename Key>
 	node_pointer find_node(Key k) const
@@ -282,10 +278,12 @@ public:
 
 	void printBT(const node_pointer node)
 	{
+		if (node == this->_end)
+			std::cout << "TREE IS EMPTY BRUV" << std::endl;
 		printBT("", node, false);
 	}
 
-	node_pointer successor(node_pointer node) const
+	node_pointer successor(node_pointer node)
 	{
 		if (node == this->maximum(this->_root))
 			return (this->_end);
@@ -299,7 +297,52 @@ public:
 		}
 		return (temp);
 	}
+	// node_pointer successor(node_pointer node) const
+	// {
+	// 	if (node == this->maximum(this->_root))
+	// 		return (this->_end);
+	// 	if (node->rc)
+	// 		return (minimum(node->rc));
+	// 	node_pointer temp = node->parent;
+	// 	while (temp && node == temp->rc)
+	// 	{
+	// 		node = temp;
+	// 		temp = temp->parent;
+	// 	}
+	// 	return (temp);
+	// }
 
+	const_node_pointer successor(const_node_pointer node) const
+	{
+		if (node == this->maximum(this->_root))
+			return ((this->_end));
+		if (node->rc)
+			return ((minimum(node->rc)));
+		const_node_pointer temp = node->parent;
+		while (temp && node == temp->rc)
+		{
+			node = temp;
+			temp = temp->parent;
+		}
+		return ((temp));
+	}
+
+	
+	//CONSTANT VERISONS
+	node_pointer predecessor(node_pointer node)
+	{
+		if (node == this->_end)
+			return (this->maximum(this->_root));
+		if (node->lc)
+			return (maximum(node->lc));
+		node_pointer temp = node->parent;
+		while (temp && node == temp->lc)
+		{
+			node = temp;
+			temp = temp->parent;
+		}
+		return (temp);
+	}
 	node_pointer predecessor(node_pointer node) const
 	{
 		if (node == this->_end)
@@ -315,6 +358,31 @@ public:
 		return (temp);
 	}
 
+	// const_node_pointer predecessor(node_pointer node) const
+	// {
+	// 	if (node == this->_end)
+	// 		return (reinterpret_cast<const_node_pointer>(this->maximum(this->_root)));
+	// 	if (node->lc)
+	// 		return (reinterpret_cast<const_node_pointer>(maximum(node->lc)));
+	// 	node_pointer temp = node->parent;
+	// 	while (temp && node == temp->lc)
+	// 	{
+	// 		node = temp;
+	// 		temp = temp->parent;
+	// 	}
+	// 	return (reinterpret_cast<const_node_pointer>(temp));
+	// }
+
+	node_pointer minimum(node_pointer node)
+	{
+		node_pointer temp;
+		temp = node;
+		if (!_root)
+			return (this->_end);
+		while (temp->lc)
+			temp = temp->lc;
+		return (temp);
+	}
 	node_pointer minimum(node_pointer node) const
 	{
 		node_pointer temp;
@@ -326,6 +394,16 @@ public:
 		return (temp);
 	}
 
+	// const_node_pointer minimum(node_pointer node) const
+	// {
+	// 	node_pointer temp = node;
+	// 	if (!_root)
+	// 		return (reinterpret_cast<const_node_pointer>(this->_end));
+	// 	while (temp->lc)
+	// 		temp = temp->lc;
+	// 	return (reinterpret_cast<const_node_pointer>(temp));
+	// }
+
 	node_pointer maximum(node_pointer node) const
 	{
 		node_pointer temp;
@@ -336,158 +414,208 @@ public:
 			temp = temp->rc;
 		return (temp);
 	}
-	
-	size_type delete_by_val(value_type val)
+	// const_node_pointer maximum(node_pointer node) const
+	// {
+	// 	const_node_pointer temp = node;
+	// 	if (!_root)
+	// 		return (this->_end);
+	// 	while (temp->rc)
+	// 		temp = temp->rc;
+	// 	return (reinterpret_cast<const_node_pointer>(temp));
+	// }
+
+	iterator begin()
 	{
-		return (delete_and_fix(find_node_to_delete(find_node(val))));
+		return (iterator(this->minimum(this->_root), this));
 	}
 
-	size_type delete_by_iterator(iterator it)
+	const_iterator begin() const
 	{
-		return (delete_and_fix(find_node_to_delete(it.getNodeptr())));
-		// return(delete_by_val(*it));
+		return(const_iterator(this->minimum(this->_root), this));
 	}
 
-	size_type delete_and_fix(node_pointer node)
+	iterator end()
 	{
-		node_pointer temp = NULL;
-		node_pointer sibling;
-		node_pointer org;
-		
-		if (!node)
+		return (iterator(this->_end, this));
+	}
+
+	const_iterator end()  const
+	{
+		return (const_iterator(this->_end, this));
+	}
+
+	void erase(iterator position)
+	{
+		node_pointer node = position->getNodeptr();
+		if (node == this->end())
+			return ;
+		this->erase(node);
+	}
+
+	template<typename Key>
+	size_type erase (Key &k)
+	{
+		node_pointer node = this->find_node<Key>(k);
+		if (node != this->_end)
+		{
+			this->erase(node);
+			return (1);
+		}
 			return (0);
-		if (this->size() == 1)
+	}
+
+	void erase(value_type &val)
+	{
+		node_pointer node = this->find_node(val);
+		if (node != this->_end)
+			this->erase(node);
+	}
+
+	void erase(node_pointer node)
+	{
+		// if (this->size() == 1)
+		if (!this->_root->lc && !this->_root->rc && this->_root != this->_end)
 		{
-			this->_allocator.destroy(this->_root->content);
-			this->_allocator.deallocate(this->_root->content, 1);
-			this->_nodealloc.deallocate(this->_root, 1);
+			delete_node(this->_root);
 			this->_root = this->_end;
+			return ;
 		}
-		else if (node->colour == RED)	//NODE RED WE CAN JUST DELETE
+		node_pointer movedupnode;
+		bool deletednodecolour;
+		if (!node->lc || !node->rc)
 		{
-			if ((temp = node->lc) || (temp = node->rc))
-			{
-				swap_nodes(node, temp);
-				node = temp;
-			}
+			deletednodecolour = node->colour;
+			movedupnode = deletenodewithzerooronechild(node);
+		}
+		else
+		{
+			node_pointer successor = this->successor(node);
+			this->_allocator.destroy(node->content);
+			this->_allocator.construct(node->content, *(successor->content));
+			deletednodecolour = successor->colour;
+			movedupnode = deletenodewithzerooronechild(successor);
+		}
+		if (deletednodecolour == BLACK)
+		{
+			fixTreeErase(movedupnode);
+		}
+		if (movedupnode && !movedupnode->content)
+		{
+			if (movedupnode == movedupnode->parent->lc)
+				movedupnode->parent->lc = NULL;
+			else if (movedupnode == movedupnode->parent->rc)
+				movedupnode->parent->rc = NULL;
+			this->_nodealloc.deallocate(movedupnode, 1);
+		}
+	}
+
+	void fixTreeErase(node_pointer node)
+	{
+		if (node == this->_root)
+			return ;
+		node_pointer sibling = node->parent->lc;
+		if (sibling == node)
+			sibling = node->parent->rc;
+		if (sibling->colour == RED)
+		{
+			sibling->colour = BLACK;
+			node->parent->colour = RED;
 			if (node == node->parent->lc)
-				node->parent->lc = NULL;
+				rotate_left(node->parent);
 			else
-				node->parent->rc = NULL;			
-			this->_allocator.destroy(node->content);
-			this->_allocator.deallocate(node->content, 1);
-			this->_nodealloc.deallocate(node, 1);
+				rotate_right(node->parent);
+			sibling = node->parent->lc;
+			if (sibling == node)
+				sibling = node->parent->rc;
 		}
-		else if (((temp = node->lc) && node->lc->colour == RED) || ((temp = node->rc) && node->rc->colour == RED))
-		{	//CHILD RED WE CAN JUST SWAP AND DELETE
-			swap_nodes(node, temp);
-			node = temp;
-			node->parent->colour = BLACK;
-			node->parent->lc = NULL;
-			node->parent->rc = NULL;
-			this->_allocator.destroy(node->content);
-			this->_allocator.deallocate(node->content, 1);
-			this->_nodealloc.deallocate(node, 1);
-		}
-		else	//NODE BLACK AND NO RED CHILD: MANY OPTIONS
+		if (isBlack(sibling->lc) && isBlack(sibling->rc))
 		{
-			org = node;
-			while (true)
-			{
-				if (!node->parent)
-				{
-					//I AM ROOT TERMINAL
-					break ;
-				}
-				else if (node == node->parent->lc)
-				{
-					sibling = node->parent->rc;
-					if (sibling->colour == RED)	//CASE 2 RED SIBLING
-					{
-						recolour(sibling);
-						recolour(node->parent);
-						rotate_left(node->parent);
-					}
-					else if (sibling->colour == BLACK && node->parent->colour == BLACK && (!sibling->rc || sibling->rc->colour == BLACK) && (!sibling->lc || sibling->lc->colour == BLACK))
-					{	//CASE 3 PARENT BLACK SIBLING BLACK SIBLING CHILDREN BLACK OR NULL
-						recolour(sibling);
-						node = node->parent;
-					}
-					else if (node->parent->colour == RED && sibling->colour == BLACK && (!sibling->rc || sibling->rc->colour == BLACK) && (!sibling->lc || sibling->lc->colour == BLACK))
-					{	//CASE 4 PARENT RED SIBLING BLACK SIBLING CHILDREN BLACK OR NULL TERMINAL
-						recolour(sibling);
-						recolour(node->parent); 
-						break ;
-					}
-					else if (node->parent->colour == BLACK && sibling->colour == BLACK && sibling->lc && sibling->lc->colour == RED && (!sibling->rc || sibling->rc->colour == BLACK))
-					{	//CASE 5 PARENT BLACK SIBLING BLACK SIBLING LEFT CHILD RED SIBLING RIGHT CHILD BLACK OR NULL
-						recolour(sibling);
-						recolour(sibling->lc);
-						rotate_right(sibling);
-					}
-					else
-					{	//ALL OTHER CASES? TERMINAL
-						sibling->colour = node->parent->colour;
-						node->parent->colour = BLACK;
-						sibling->rc->colour = BLACK;
-						rotate_left(node->parent);
-						break ;
-					}
-				}
-				else
-				{
-					sibling = node->parent->lc;
-					if (sibling->colour == RED)
-					{	//CASE 2 MIRROR
-						recolour(sibling);
-						recolour(node->parent);
-						rotate_right(node->parent);
-					}
-					else if (sibling->colour == BLACK && node->parent->colour == BLACK && (!sibling->rc || sibling->rc->colour == BLACK) && (!sibling->lc || sibling->lc->colour == BLACK))
-					{	//CASE 3 MIRROR
-						recolour(sibling);
-						node = node->parent;
-					}
-					else if (node->parent->colour == RED && sibling->colour == BLACK && (!sibling->rc || sibling->rc->colour == BLACK) && (!sibling->lc || sibling->lc->colour == BLACK))
-					{	//CASE 4 MIRROR
-						recolour(sibling);
-						recolour(node->parent);
-						break ;
-					}
-					else if (node->parent->colour == BLACK && sibling->colour == BLACK && sibling->rc && sibling->rc->colour == RED && (!sibling->lc || sibling->lc->colour == BLACK))
-					{	//CASE 5 MIRROR
-						recolour(sibling);
-						recolour(sibling->rc);
-						rotate_left(sibling);
-					}
-					else
-					{	//CASE 6 MIRROR
-						sibling->colour = node->parent->colour;
-						node->parent->colour = BLACK;
-						sibling->lc->colour = BLACK;
-						rotate_right(node->parent);
-						break ;
-					}
-				}
-			}
-			if ((temp = org->lc) || (temp = org->rc))
-			{
-				swap_nodes(temp, org);
-				org = temp;
-			}
-			if (org->parent)
-			{
-				if (org == org->parent->lc)
-					org->parent->lc = NULL;
-				else
-					org->parent->rc = NULL;
-			}
-			this->_allocator.destroy(org->content);
-			this->_allocator.deallocate(org->content, 1);
-			this->_nodealloc.deallocate(org, 1);
-			// delete org;
+			sibling->colour = RED;
+			if (node->parent->colour == RED)
+				node->parent->colour = BLACK;
+			else
+				fixTreeErase(node->parent);
 		}
-		return (1);
+		else
+		{
+			bool isLeft = (node == node->parent->lc);
+			if (isLeft && isBlack(sibling->rc))
+			{
+				sibling->lc->colour = BLACK;
+				sibling->colour = RED;
+				rotate_right(sibling);
+				sibling = node->parent->rc;
+			}
+			else if (!isLeft && isBlack(sibling->lc))
+			{
+				sibling->rc->colour = BLACK;
+				sibling->colour = RED;
+				rotate_left(sibling);
+				sibling = node->parent->lc;
+			}
+			sibling->colour = node->parent->colour;
+			node->parent->colour = BLACK;
+			if (isLeft)
+			{
+				sibling->rc->colour = BLACK;
+				rotate_left(node->parent);
+			}
+			else
+			{
+				sibling->lc->colour = BLACK;
+				rotate_right(node->parent);
+			}
+		}
+	}
+
+	bool isBlack(node_pointer node)
+	{
+		 return (!node || node->colour == BLACK);
+	}
+
+	node_pointer deletenodewithzerooronechild(node_pointer node)
+	{
+		node_pointer temp;
+		if (node->lc || node->rc)
+		{
+			return (delete_only_child(node));
+		}
+		else if (node->colour == RED)
+		{
+			delete_node(node);
+			return (NULL);
+		}
+		else
+		{
+			temp = this->_nodealloc.allocate(1);
+			temp->colour = BLACK;
+			temp->lc = NULL;
+			temp->rc = NULL;
+			temp->content = NULL;
+			temp->parent = node->parent;
+			if (node == node->parent->lc)
+				node->parent->lc = temp;
+			else
+				node->parent->rc = temp;
+			delete_node(node);
+			return (temp);
+		}
+	}
+
+	node_pointer delete_only_child(node_pointer node)
+	{
+		node_pointer child;
+		if (node->lc)
+			child = node->lc;
+		else if (node->rc)
+			child = node->rc;
+		else
+			return (NULL);
+		node->colour = child->colour;
+		this->_allocator.destroy(node->content);
+		this->_allocator.construct(node->content, *(child->content));
+		delete_node(child);
+		return (node);
 	}
 
 	void clear()
@@ -531,6 +659,15 @@ private:
 
 	void delete_node(node_pointer node)
 	{
+		if (!node)
+			return ;
+		if (node->parent)
+		{
+			if (node == node->parent->lc)
+				node->parent->lc = NULL;
+			else if (node == node->parent->rc)
+				node->parent->rc = NULL;
+		}
 		this->_allocator.destroy(node->content);
 		this->_allocator.deallocate(node->content, 1);
 		this->_nodealloc.deallocate(node, 1);
@@ -564,9 +701,10 @@ private:
 
 	void swap_nodes(node_pointer node, node_pointer other)
 	{
-		// value_type temp(node->content);
+		// pointer temp = node->content;
 		// node->content = other->content;
 		// other->content = temp;
+
 		this->_allocator.destroy(node->content);
 		this->_allocator.construct(node->content, *(other->content));
 	}

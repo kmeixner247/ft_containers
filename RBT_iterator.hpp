@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/27 11:15:00 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/02 13:20:17 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/03 14:03:25 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ template<typename T, typename Tree>
 class constant_RBT_iterator;
 template<typename T>
 struct Node;
+template<typename T>
+struct ConstNode;
 template<typename T, typename Tree>
 class RBT_iterator: public iterator<bidirectional_iterator_tag, T>
 {
@@ -84,7 +86,6 @@ public:
 	RBT_iterator operator++(int)
 	{
 		RBT_iterator temp(*this);
-
 		this->_currentnode = this->_tree->successor(this->_currentnode);
 		this->_current = this->_currentnode->content;
 		return (temp);
@@ -160,12 +161,28 @@ public:
 	constant_RBT_iterator(RBT_iterator<T, Tree> const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(rhs.getTree()) {}
 	template<typename Other, typename OtherTree>
 	constant_RBT_iterator(RBT_iterator<Other, OtherTree> const &rhs) : _current(reinterpret_cast<T *>(rhs.base())), _currentnode(reinterpret_cast<node_pointer>(rhs.getNodeptr())), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {} 
+	template<typename Other, typename OtherTree>
+	constant_RBT_iterator(constant_RBT_iterator<Other, OtherTree> const &rhs) : _current(reinterpret_cast<T *>(rhs.base())), _currentnode(reinterpret_cast<node_pointer>(rhs.getNodeptr())), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {} 
 	template<typename OtherTree>
 	constant_RBT_iterator(constant_RBT_iterator<T, OtherTree> const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {} 
-	constant_RBT_iterator(node_pointer p, Tree *tree) : _current(&p->content), _currentnode(p), _tree(tree) {}
+	template<typename Other>
+	constant_RBT_iterator(Node<Other>* p, Tree const *tree) : _current(reinterpret_cast<pointer>(p->content)), _currentnode(reinterpret_cast<node_pointer>(p)), _tree(const_cast<Tree *>(tree)) {}
+	template<typename Other>
+	constant_RBT_iterator(ConstNode<Other>* p, Tree const *tree) : _current(reinterpret_cast<pointer>(p->content)), _currentnode(reinterpret_cast<node_pointer>(p)), _tree(const_cast<Tree *>(tree)) {}
+
 	const pointer base() const
 	{
 		return (this->_current);
+	}
+
+	node_pointer getNodeptr() const
+	{
+		return (this->_currentnode);
+	}
+
+	Tree *getTree() const
+	{
+		return (this->_tree);
 	}
 
 	template<typename Other, typename OtherTree>
@@ -205,7 +222,7 @@ public:
 	constant_RBT_iterator &operator++()
 	{
 		this->_currentnode = this->_tree->successor(this->_currentnode);
-		this->_current = &this->_currentnode->content;
+		this->_current = this->_currentnode->content;
 		return (*this);
 	}
 	
@@ -214,14 +231,14 @@ public:
 		constant_RBT_iterator temp(*this);
 
 		this->_currentnode = this->_tree->successor(this->_currentnode);
-		this->_current = &this->_currentnode->content;
+		this->_current = this->_currentnode->content;
 		return (temp);
 	}
 
 	constant_RBT_iterator &operator--()
 	{
 		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = &this->_currentnode->content;
+		this->_current = this->_currentnode->content;
 		returm (*this);
 	}
 	
@@ -229,7 +246,7 @@ public:
 	{
 		constant_RBT_iterator temp(*this);
 		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = &this->_currentnode->content;
+		this->_current = this->_currentnode->content;
 		return (temp);
 	}
 	
