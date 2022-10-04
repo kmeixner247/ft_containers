@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/03 01:00:42 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/04 19:26:53 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ public:
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
 	//iterators
-	typedef typename ft::RBT_iterator<value_type, tree_type> iterator;
-	typedef typename ft::constant_RBT_iterator<const value_type, tree_type> const_iterator;
+	typedef typename ft::RBT_iterator<typename tree_type::node, tree_type> iterator;
+	typedef typename ft::const_RBT_iterator<typename tree_type::node, tree_type> const_iterator;
 	typedef typename ft::reverse_iterator<iterator> reverse_iterator;
 	typedef typename ft::reverse_iterator<const_iterator> const_reverse_iterator;
 	
@@ -85,9 +85,10 @@ public:
 	~map()
 	{
 		this->_tree.clear();
-		this->_tree.deleteEnd();
+		this->_tree.deleteEnds();
 	}
 
+	//Assignment operator
 	map &operator=(const map &rhs)
 	{
 		this->_allocator = rhs._allocator;
@@ -102,14 +103,14 @@ public:
 	*/
 	iterator begin()
 	{
-		return(iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
-		// return (this->_tree.begin());
+		// return(iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
+		return (this->_tree.begin());
 	}
 
 	const_iterator begin() const
 	{
-		return(const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
-		// return (this->_tree.begin());
+		// return(const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
+		return (this->_tree.begin());
 	}
 
 	iterator end()
@@ -127,25 +128,23 @@ public:
 	reverse_iterator rbegin()
 	{
 		reverse_iterator temp(this->end());
-		return (temp);
+		return (--temp);
 	}
 	
 	const_reverse_iterator rbegin() const
 	{
 		const_reverse_iterator temp(this->end());
-		return (temp);
+		return (--temp);
 	}
 	
 	reverse_iterator rend()
 	{
-		reverse_iterator temp(this->begin());
-		return (temp);
+		return (this->_tree.rend());
 	}
 	
 	const_reverse_iterator rend() const
 	{
-		const_reverse_iterator temp(this->begin());
-		return (temp);
+		return (this->_tree.rend());
 	}
 
 	/*	
@@ -196,7 +195,7 @@ public:
 	pair<iterator,bool> insert (const value_type& val)
 	{
 		bool booltemp = (this->_tree.find_node(val)) == this->_tree.getEnd();
-		iterator temp = iterator(this->_tree.insert(val), &this->_tree);
+		iterator temp = iterator(this->_tree.insert(val), this->_tree.getEnd(), this->_tree.getRend());
 		return (ft::make_pair<iterator, bool>(temp, booltemp));
 	}
 
@@ -400,5 +399,3 @@ namespace std
 	}
 }
 #endif
-
-

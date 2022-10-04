@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/03 19:42:56 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/04 19:02:21 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -385,15 +385,46 @@ t_timeval start;
     //     v2.push_back(it3->second);
     // }
 	// std::cerr << "FT TOOK " << gettime(start) << "ms" << std::endl;
-	ft::map<int, int> mp;
-	for (int i = 0; i < 10; i++)
-		mp.insert(ft::make_pair(i, i));
-	ft::map<int, int>::const_iterator it = mp.begin();
-	while (it != mp.end())
-		std::cerr << it++ << std::endl;
+	// ft::map<int, int> mp;
+	// for (int i = 0; i < 10; i++)
+	// 	mp.insert(ft::make_pair(i, i));
+	// ft::map<int, int>::const_iterator it = mp.begin();
+	// while (it != mp.end())
+	// 	std::cerr << it++ << std::endl;
 }
+ft::map<int, int> mp1;
+ft::map<int, int> mp2;
+mp1.insert(ft::make_pair(1,1));
+mp1.insert(ft::make_pair(2,1));
+mp1.insert(ft::make_pair(3,1));
+mp2.insert(ft::make_pair(1,1));
+mp2.insert(ft::make_pair(2,1));
+mp2.insert(ft::make_pair(3,1));
+ft::map<int, int>::const_iterator it = mp1.begin();
+// std::cout << it->first << std::endl;
+// mp1.printBT();
+
+// it++;
+// std::cout << it->first << std::endl;
+// it++;
+// std::cout << it->first << std::endl;
+// it++;
+// std::cout << it->first << std::endl;
+// it--;
+// std::cout << it->first << std::endl;
+// it--;
+// std::cout << it->first << std::endl;
+// it--;
+// std::cout << it->first << std::endl;
+// it--;
+// std::cout << it->first << std::endl;
+// it++;
+// std::cout << it->first << std::endl;
 
 
+// std::cerr<< std::boolalpha << (mp1.end() == mp2.end()) << std::endl;
+// for (ft::map<int, int>::iterator it = mp1.begin(); it != mp1.end(); ++it)
+// 	std::cout << it->first << std::endl;
 // {
 // 	std::map<int, int> mp;
 //     for (int i = 0, j = 0; i < 5 * _ratio; ++i, ++j)
@@ -414,5 +445,36 @@ t_timeval start;
 
 
 // compare_print_vectors(v, v2);
-	
+// std::vector<int> v1;
+// std::vector<int> v2;
+// {
+// 	std::map<int, int> mp;
+//     for (int i = 0, j = 10; i < 30 * _ratio; ++i, ++j) {
+//         mp.insert(std::make_pair(i, j));
+//     }
+//     std::map<int, int> mp2(mp.begin(), mp.end());
+//     std::map<int, int>::iterator it = mp2.begin();
+//     for (int i = 0; i < 30 * _ratio; ++i, it++) {
+//         v1.push_back(it->first);
+//         v1.push_back(it->second);
+//     }
+// }
+
+// {
+
+// 	_map<int, int> mp;
+//     for (int i = 0, j = 10; i < 30 * _ratio; ++i, ++j) {
+//         mp.insert(_make_pair(i, j));
+//     }
+// 	mp.printBT();
+//     _map<int, int> mp2(mp.begin(), mp.end());
+//     _map<int, int>::iterator it = mp2.begin();
+//     for (int i = 0; i < 30 * _ratio; ++i, it++) {
+//         v2.push_back(it->first);
+//         v2.push_back(it->second);
+//     }
+// }
+// compare_print_vectors(v1, v2);
 }
+// 	     RBT_iterator<      pair<const int, int>, RBT<pair<const int, int>, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > > >
+// constant_RBT_iterator<const pair<const int, int>, RBT<pair<const int, int>, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > > >

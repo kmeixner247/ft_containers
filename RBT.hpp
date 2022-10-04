@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/03 15:27:50 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/04 19:27:23 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,26 +50,29 @@ public:
 	typedef T value_type;
 	typedef Compare key_compare;
 	typedef Alloc allocator_type;
+	typedef Node<T> node;
 	typedef Node<T>* node_pointer;
-	typedef ConstNode<T>* const_node_pointer;
+	typedef Node<const T>* const_node_pointer;
 	typedef RBT<value_type, key_compare, allocator_type> tree_type;
 	typedef typename allocator_type::reference reference;
 	typedef typename allocator_type::const_reference const_reference;
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
-	typedef typename ft::RBT_iterator<value_type, tree_type> iterator;
-	typedef typename ft::constant_RBT_iterator<value_type, tree_type> const_iterator;
+	typedef typename ft::RBT_iterator<node, tree_type> iterator;
+	typedef typename ft::const_RBT_iterator<node, tree_type> const_iterator;
 	typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
-	// ft::RBT<ft::pair<const int, foo<int> >, std::__1::less<int>, std::__1::allocator<ft::pair<const int, foo<int> > > >::node_pointer
-	// Node<ft::pair<const int, foo<int> > > *
-	// ft::RBT<ft::pair<const int, foo<int> >, std::__1::less<int>, std::__1::allocator<ft::pair<const int, foo<int> > > >::const_node_pointer
-	// ConstNode<ft::pair<const int, foo<int> > > *
-	  
+
 	RBT(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 	{
 		this->_compare = comp;
 		this->_allocator = alloc;
+		this->create_ends();
+		this->_root = this->_end;
+	}
+
+	void create_ends()
+	{
 		this->_end = this->_nodealloc.allocate(1);
 		this->_end->content = this->_allocator.allocate(1);
 		this->_allocator.construct(this->_end->content);
@@ -77,7 +80,13 @@ public:
 		this->_end->parent = NULL;
 		this->_end->lc = NULL;
 		this->_end->rc = NULL;
-		this->_root = this->_end;
+		this->_rend = this->_nodealloc.allocate(1);
+		this->_rend->content = this->_allocator.allocate(1);
+		this->_allocator.construct(this->_rend->content);
+		this->_rend->colour = BLACK;
+		this->_rend->parent = NULL;
+		this->_rend->lc = NULL;
+		this->_rend->rc = NULL;
 	}
 
 	RBT (const RBT &rhs)
@@ -116,6 +125,21 @@ public:
 		return (this->_compare);
 	}
 	
+	node_pointer getEnd() const
+	{
+		return (this->_end);
+	}
+	
+	node_pointer getRend() const
+	{
+		return (this->_rend);
+	}
+	
+	node_pointer getRoot() const
+	{
+		return (this->_root);
+	}
+	
 	void copy_rec(node_pointer node, node_pointer rhsnode)
 	{
 		if (rhsnode->lc)
@@ -149,16 +173,6 @@ public:
 			return (0);
 		size_rec(this->_root, &count);
 		return (count);
-	}
-
-	node_pointer getRoot() const
-	{
-		return (this->_root);
-	}
-	
-	node_pointer getEnd() const
-	{
-		return (this->_end);
 	}
 
 	template<typename Key>
@@ -231,6 +245,8 @@ public:
 			newnode->colour = BLACK;
 			newnode->parent = NULL;
 			this->_root = newnode;
+			this->_end->parent = this->_root;
+			this->_rend->parent = this->_root;
 			return (newnode);
 		}
 		newnode->colour = RED;
@@ -273,6 +289,10 @@ public:
 				}
 			}
 		}
+		if (this->_compare(get_key(this->_rend->parent->content), get_key(org->content)))
+			this->_rend->parent = org;
+		if (this->_compare(get_key(org->content), get_key(this->_end->parent->content)))
+			this->_end->parent = org;
 		return (org);
 	}
 
@@ -426,22 +446,31 @@ public:
 
 	iterator begin()
 	{
-		return (iterator(this->minimum(this->_root), this));
+		return (iterator(this->minimum(this->_root), this->_end, this->_rend));
 	}
 
 	const_iterator begin() const
 	{
-		return(const_iterator(this->minimum(this->_root), this));
+		return(const_iterator(this->minimum(this->_root), this->_end, this->_rend));
 	}
 
 	iterator end()
 	{
-		return (iterator(this->_end, this));
+		return (iterator(this->_end, this->_end, this->_rend));
 	}
 
 	const_iterator end()  const
 	{
-		return (const_iterator(this->_end, this));
+		return (const_iterator(this->_end, this->_end, this->_rend));
+	}
+	iterator rend()
+	{
+		return (iterator(this->_rend, this->_end, this->_rend));
+	}
+
+	const_iterator rend()  const
+	{
+		return (const_iterator(this->_rend, this->_end, this->_end));
 	}
 
 	void erase(iterator position)
@@ -624,15 +653,19 @@ public:
 		this->_root = this->_end;
 	}
 
-	void deleteEnd()
+	void deleteEnds()
 	{
 		this->_allocator.destroy(this->_end->content);
 		this->_allocator.deallocate(this->_end->content, 1);
 		this->_nodealloc.deallocate(this->_end, 1);
+		this->_allocator.destroy(this->_rend->content);
+		this->_allocator.deallocate(this->_rend->content, 1);
+		this->_nodealloc.deallocate(this->_rend, 1);
 	}
 private:
 	node_pointer _root;
 	node_pointer _end;
+	node_pointer _rend;
 	allocator_type _allocator;
 	key_compare _compare;
 	std::allocator<Node<T> > _nodealloc;

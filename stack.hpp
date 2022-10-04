@@ -6,10 +6,12 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/03 13:37:18 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/03 19:20:51 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/04 14:45:37 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef STACK_HPP
+#define STACK_HPP
 #include "vector.hpp"
 #include <stack>
 namespace ft
@@ -112,3 +114,5 @@ bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
 }
 
 }	//end of namespace ft
+
+#endif

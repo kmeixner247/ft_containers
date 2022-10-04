@@ -5,302 +5,319 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/27 11:15:00 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/03 14:03:25 by kmeixner         ###   ########.fr       */
+/*   Created: 2022/10/04 17:21:42 by kmeixner          #+#    #+#             */
+/*   Updated: 2022/10/04 19:43:53 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef RBT_ITERATOR_HPP
 #define RBT_ITERATOR_HPP
 #include "RBT.hpp"
 #include "ft_iterator.hpp"
+
 namespace ft
 {
-template<typename T, typename Tree>
-class constant_RBT_iterator;
-template<typename T>
-struct Node;
-template<typename T>
-struct ConstNode;
+template <typename T, class Tree>
+class const_RBT_iterator;
+
 template<typename T, typename Tree>
 class RBT_iterator: public iterator<bidirectional_iterator_tag, T>
 {
 public:
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::difference_type difference_type;
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::value_type value_type;
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::pointer pointer;
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::reference reference;
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::iterator_category iterator_category;
-private:
-	typedef Node<T> node;
-	typedef node * node_pointer;
-public:
-	RBT_iterator() : _current(0), _currentnode(0), _tree(0) {}
-	RBT_iterator(RBT_iterator const &rhs) : _current(rhs._current), _currentnode(rhs._currentnode), _tree(rhs._tree) {}
-	template<typename Other, typename OtherTree>
-	RBT_iterator(RBT_iterator<Other, OtherTree> const &rhs) : _current(reinterpret_cast<T *>(rhs.base())), _currentnode(reinterpret_cast<node_pointer>(rhs.getNodeptr())), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {}
-	// template<typename OtherTree>
-	// RBT_iterator(RBT_iterator const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {}
-	RBT_iterator(node_pointer p, Tree *tree) : _current(p->content), _currentnode(p), _tree(tree) {}
+	typedef typename Tree::value_type value_type;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::difference_type difference_type;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::pointer pointer;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::reference reference;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::iterator_category iterator_category;
 
-	pointer base() const
-	{
-		return (this->_current);
-	}
+	RBT_iterator() : _current(0), _end(0), _rend(0) {}
+	RBT_iterator(T *p, T *end, T *rend) : _current(p), _end(end), _rend(rend) {}
+	RBT_iterator(const RBT_iterator &rhs) : _current(rhs._current), _end(rhs._end), _rend(rhs._rend) {}
 
-	node_pointer getNodeptr() const
+	RBT_iterator &operator=(const RBT_iterator &rhs)
 	{
-		return (this->_currentnode);
-	}
-
-	Tree *getTree() const
-	{
-		return (this->_tree);
-	}
-
-	template<typename Other, typename OtherTree>
-	RBT_iterator &operator=(RBT_iterator<Other, OtherTree> const &rhs)
-	{
-		this->_current = reinterpret_cast<T *>(rhs.base());
-		this->_currentnode = reinterpret_cast<node_pointer>(rhs.getNodeptr());
-		this->_tree = reinterpret_cast<Tree *>(rhs.getTree());
+		this->_current = rhs._current;
+		this->_end = rhs._end;
+		this->_rend = rhs._rend;
 		return (*this);
 	}
-	
-	RBT_iterator &operator=(RBT_iterator<T, Tree> const &rhs)
+
+	T *base() const
 	{
-		this->_current = rhs.base();
-		this->_currentnode = rhs.getNodeptr();
-		this->_tree = rhs.getTree();
-		return (*this);
+		return(this->_current);
 	}
 	
+	T* getEnd() const
+	{
+		return (this->_end);
+	}
+	
+	T* getRend() const
+	{
+		return (this->_rend);
+	}
+	
+	reference operator*() const
+	{
+		return (*(this->_current)->content);
+	}
+	
+	pointer operator->() const
+	{
+		return (this->_current->content);
+	}
+
 	RBT_iterator &operator++()
 	{
-		this->_currentnode = this->_tree->successor(this->_currentnode);
-		this->_current = this->_currentnode->content;
+		T *temp = this->_current;
+		//if iterator is at _rend, go to min
+		if (temp == this->_rend)
+			temp = this->_rend->parent;
+		//if right child exist, find minimum of right tree
+		else if (temp->rc)
+		{
+			temp = temp->rc;
+			while (temp->lc)
+				temp = temp->lc;
+		}
+		//otherwise go to first right parent
+		else 
+		{
+			while (temp->parent && temp == temp->rc)
+				temp = temp->rc;
+			if (temp->parent)
+				temp = temp->parent;
+			//if there is no right parent it means that the iterator was at max and gets set to _end
+			else
+				temp = this->_end;
+		}
+		this->_current = temp;
 		return (*this);
 	}
-	
+
 	RBT_iterator operator++(int)
 	{
-		RBT_iterator temp(*this);
-		this->_currentnode = this->_tree->successor(this->_currentnode);
-		this->_current = this->_currentnode->content;
+		RBT_iterator temp = *this;
+		++(*this);
 		return (temp);
 	}
 
 	RBT_iterator &operator--()
 	{
-		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = this->_currentnode->content;
+		T *temp = this->_current;
+		//if iterator is at _end, go to max
+		if (temp == this->_end)
+			temp = this->_end->parent;
+		//if left child exist, find maximum of left tree
+		else if (temp->lc)
+		{
+			temp = temp->lc;
+			while (temp->rc)
+				temp = temp->rc;
+		}
+		//otherwise go to first left parent
+		else 
+		{
+			while (temp->parent && temp == temp->lc)
+				temp = temp->lc;
+			if (temp->parent)
+				temp = temp->parent;
+			else //if there is no right parent it means that the iterator was at min and gets set to _rend
+				temp = this->_rend;
+		}
+		this->_current = temp;
 		return (*this);
 	}
-	
+
 	RBT_iterator operator--(int)
 	{
-		RBT_iterator temp(*this);
-		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = this->_currentnode->content;
+		RBT_iterator temp = *this;
+		--(*this);
 		return (temp);
 	}
-	
+
 	bool operator==(RBT_iterator<T, Tree> rhs)
 	{
-		
-		return ((this->_current == rhs._current));
+		return ((this->base() == rhs.base()));
 	}
 	
-	bool operator==(constant_RBT_iterator<T, Tree> rhs) const
+	bool operator==(const_RBT_iterator<T, Tree> rhs) const
 	{
-		return ((this->_current == rhs._current));
+		return ((this->base() == rhs.base()));
 	}
 	
 	bool operator!=(RBT_iterator<T, Tree> rhs)
 	{
-		return ((this->_current != rhs._current));
+		return ((this->base() != rhs.base()));
 	}
 
-	bool operator!=(constant_RBT_iterator<T, Tree> rhs) const
+	bool operator!=(const_RBT_iterator<T, Tree> rhs) const
 	{
-		return ((this->_current != rhs._current));
+		return ((this->base() != rhs.base()));
 	}
 	
-	reference operator*() const
-	{
-		return (*this->_current);
-	}
-	
-	pointer operator->() const
-	{
-		return (this->_current);
-	}
 private:
-	pointer	_current;
-	node_pointer _currentnode;
-	Tree *_tree;
+	T *_current;
+	T *_end;
+	T *_rend;
 };
 
-
 template<typename T, typename Tree>
-class constant_RBT_iterator: public iterator<bidirectional_iterator_tag, T>
+class const_RBT_iterator: public iterator<bidirectional_iterator_tag, T>
 {
 public:
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::difference_type difference_type;
-	typedef const typename ft::iterator<bidirectional_iterator_tag, T>::value_type value_type;
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::pointer pointer;
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::reference reference;
-	typedef typename ft::iterator<bidirectional_iterator_tag, T>::iterator_category iterator_category;
-private:
-	typedef Node<T> node;
-	typedef node * node_pointer;
-public:
-	constant_RBT_iterator() : _current(0), _currentnode(0), _tree(0) {}
-	constant_RBT_iterator(constant_RBT_iterator const &rhs) : _current(rhs._current), _currentnode(rhs._currentnode), _tree(rhs._tree) {}
-	constant_RBT_iterator(RBT_iterator<T, Tree> const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(rhs.getTree()) {}
-	template<typename Other, typename OtherTree>
-	constant_RBT_iterator(RBT_iterator<Other, OtherTree> const &rhs) : _current(reinterpret_cast<T *>(rhs.base())), _currentnode(reinterpret_cast<node_pointer>(rhs.getNodeptr())), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {} 
-	template<typename Other, typename OtherTree>
-	constant_RBT_iterator(constant_RBT_iterator<Other, OtherTree> const &rhs) : _current(reinterpret_cast<T *>(rhs.base())), _currentnode(reinterpret_cast<node_pointer>(rhs.getNodeptr())), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {} 
-	template<typename OtherTree>
-	constant_RBT_iterator(constant_RBT_iterator<T, OtherTree> const &rhs) : _current(rhs.base()), _currentnode(rhs.getNodeptr()), _tree(reinterpret_cast<Tree *>(rhs.getTree())) {} 
-	template<typename Other>
-	constant_RBT_iterator(Node<Other>* p, Tree const *tree) : _current(reinterpret_cast<pointer>(p->content)), _currentnode(reinterpret_cast<node_pointer>(p)), _tree(const_cast<Tree *>(tree)) {}
-	template<typename Other>
-	constant_RBT_iterator(ConstNode<Other>* p, Tree const *tree) : _current(reinterpret_cast<pointer>(p->content)), _currentnode(reinterpret_cast<node_pointer>(p)), _tree(const_cast<Tree *>(tree)) {}
+	typedef  const typename Tree::value_type value_type;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::difference_type difference_type;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::pointer pointer;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::reference reference;
+	typedef typename ft::iterator<bidirectional_iterator_tag, value_type>::iterator_category iterator_category;
 
-	const pointer base() const
+	const_RBT_iterator() : _current(0), _end(0), _rend(0) {}
+	const_RBT_iterator(T *p, T *end, T *rend) : _current(p), _end(end), _rend(rend) {}
+	const_RBT_iterator(const const_RBT_iterator &rhs) : _current(rhs._current), _end(rhs._end), _rend(rhs._rend) {}
+	const_RBT_iterator(const RBT_iterator<T, Tree> &rhs)
 	{
-		return (this->_current);
+		*this = rhs;
 	}
-
-	node_pointer getNodeptr() const
-	{
-		return (this->_currentnode);
-	}
-
-	Tree *getTree() const
-	{
-		return (this->_tree);
-	}
-
-	template<typename Other, typename OtherTree>
-	constant_RBT_iterator &operator=(RBT_iterator<Other, OtherTree> const &rhs)
-	{
-		this->_current = reinterpret_cast<T *>(rhs.base());
-		this->_currentnode = reinterpret_cast<node_pointer>(rhs.getNodeptr());
-		this->_tree = reinterpret_cast<Tree *>(rhs.getTree());
-		return (*this);
-	}
-
-	template<typename Other, typename OtherTree>
-	constant_RBT_iterator &operator=(constant_RBT_iterator<Other, OtherTree> const &rhs)
-	{
-		this->_current = reinterpret_cast<T *>(rhs.base());
-		this->_currentnode = reinterpret_cast<node_pointer>(rhs.getNodeptr());
-		this->_tree = reinterpret_cast<Tree *>(rhs.getTree());
-		return (*this);
-	}
-
-	constant_RBT_iterator &operator=(RBT_iterator<T, Tree> const &rhs)
+	const_RBT_iterator &operator=(const const_RBT_iterator &rhs)
 	{
 		this->_current = rhs._current;
-		this->_currentnode = rhs._currentnode;
-		this->_tree = rhs._tree;
+		this->_end = rhs._end;
+		this->_rend = rhs._rend;
 		return (*this);
 	}
 	
-	constant_RBT_iterator &operator=(constant_RBT_iterator<T, Tree> const &rhs)
+	const_RBT_iterator &operator=(const RBT_iterator<T, Tree> &rhs)
 	{
-		this->_current = rhs._current;
-		this->_currentnode = rhs._currentnode;
-		this->_tree = rhs._tree;
+		this->_current = rhs.base();
+		this->_end = rhs.getEnd();
+		this->_rend = rhs.getRend();
 		return (*this);
 	}
-	
-	constant_RBT_iterator &operator++()
-	{
-		this->_currentnode = this->_tree->successor(this->_currentnode);
-		this->_current = this->_currentnode->content;
-		return (*this);
-	}
-	
-	constant_RBT_iterator operator++(int)
-	{
-		constant_RBT_iterator temp(*this);
 
-		this->_currentnode = this->_tree->successor(this->_currentnode);
-		this->_current = this->_currentnode->content;
-		return (temp);
-	}
-
-	constant_RBT_iterator &operator--()
+	T *base() const
 	{
-		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = this->_currentnode->content;
-		returm (*this);
+		return(this->_current);
 	}
 	
-	constant_RBT_iterator operator--(int)
+	T* getEnd() const
 	{
-		constant_RBT_iterator temp(*this);
-		this->_currentnode = this->_tree->predecessor(this->_currentnode);
-		this->_current = this->_currentnode->content;
-		return (temp);
+		return (this->_end);
 	}
 	
-	bool operator==(RBT_iterator<T, Tree> rhs) const
+	T* getRend() const
 	{
-		
-		return ((*this->_current == *rhs._current));
-	}
-	
-	bool operator==(constant_RBT_iterator<T, Tree> rhs) const
-	{
-		return ((*this->_current == *rhs._current));
-	}
-	
-	bool operator!=(RBT_iterator<T, Tree> rhs) const
-	{
-		return ((*this->_current != *rhs._current));
-	}
-
-	bool operator!=(constant_RBT_iterator<T, Tree> rhs) const
-	{
-		return ((*this->_current != *rhs._current));
+		return (this->_rend);
 	}
 	
 	const reference operator*() const
 	{
-		return (*this->_current);
+		return (*(this->_current)->content);
 	}
 	
 	const pointer operator->() const
 	{
-		return (this->_current);
+		return (this->_current->content);
 	}
+
+	const_RBT_iterator &operator++()
+	{
+		T *temp = this->_current;
+		//if iterator is at _rend, go to min
+		if (temp == this->_rend)
+			temp = this->_rend->parent;
+		//if right child exist, find minimum of right tree
+		else if (temp->rc)
+		{
+			temp = temp->rc;
+			while (temp->lc)
+				temp = temp->lc;
+		}
+		//otherwise go to first right parent
+		else 
+		{
+			while (temp->parent && temp == temp->rc)
+				temp = temp->rc;
+			if (temp->parent)
+				temp = temp->parent;
+			//if there is no right parent it means that the iterator was at max and gets set to _end
+			else
+				temp = this->_end;
+		}
+		this->_current = temp;
+		return (*this);
+	}
+
+	const_RBT_iterator operator++(int)
+	{
+		const_RBT_iterator temp = *this;
+		++(*this);
+		return (temp);
+	}
+
+	const_RBT_iterator &operator--()
+	{
+		T *temp = this->_current;
+		//if iterator is at _end, go to max
+		if (temp == this->_end)
+			temp = this->_end->parent;
+		//if left child exist, find maximum of left tree
+		else if (temp->lc)
+		{
+			temp = temp->lc;
+			while (temp->rc)
+				temp = temp->rc;
+		}
+		//otherwise go to first left parent
+		else 
+		{
+			while (temp->parent && temp == temp->lc)
+				temp = temp->lc;
+			if (temp->parent)
+				temp = temp->parent;
+			else //if there is no right parent it means that the iterator was at min and gets set to _rend
+				temp = this->_rend;
+		}
+		this->_current = temp;
+		return (*this);
+	}
+
+	const_RBT_iterator operator--(int)
+	{
+		const_RBT_iterator temp = *this;
+		--(*this);
+		return (temp);
+	}
+
+	bool operator==(RBT_iterator<T, Tree> rhs)
+	{
+		return ((this->base() == rhs.base()));
+	}
+	
+	bool operator==(const_RBT_iterator<T, Tree> rhs) const
+	{
+		return ((this->base() == rhs.base()));
+	}
+	
+	bool operator!=(RBT_iterator<T, Tree> rhs)
+	{
+		return ((this->base() != rhs.base()));
+	}
+
+	bool operator!=(const_RBT_iterator<T, Tree> rhs) const
+	{
+		return ((this->base() != rhs.base()));
+	}
+	
 private:
-	pointer	_current;
-	node_pointer _currentnode;
-	Tree *_tree;
+	T *_current;
+	T *_end;
+	T *_rend;
 };
 
-// template<class Iterator>
-// class reverse_RBT_iterator
-// {
-// public:
-// 	typedef Iterator iterator_type;
-// 	typedef typename iterator_traits<Iterator>::iterator_category iterator_category;
-// 	typedef typename iterator_traits<Iterator>::value_type value_type;
-// 	typedef typename iterator_traits<Iterator>::difference_type difference_type;
-// 	typedef typename iterator_traits<Iterator>::pointer pointer;
-// 	typedef typename iterator_traits<Iterator>::reference reference;
 
-// 	reverse_RBT_iterator() : _iterator
-// private:
-// 	iterator_type _iterator;
-// };
 
-}	//namespace ft end
+
+} //end of namespace ft
+
 #endif
