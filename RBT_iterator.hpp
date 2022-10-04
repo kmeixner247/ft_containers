@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 17:21:42 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 19:43:53 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/04 20:03:41 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,8 @@ public:
 		//otherwise go to first right parent
 		else 
 		{
-			while (temp->parent && temp == temp->rc)
-				temp = temp->rc;
+			while (temp->parent && temp == temp->parent->rc)
+				temp = temp->parent;
 			if (temp->parent)
 				temp = temp->parent;
 			//if there is no right parent it means that the iterator was at max and gets set to _end
@@ -118,8 +118,8 @@ public:
 		//otherwise go to first left parent
 		else 
 		{
-			while (temp->parent && temp == temp->lc)
-				temp = temp->lc;
+			while (temp->parent && temp == temp->parent->lc)
+				temp = temp->parent;
 			if (temp->parent)
 				temp = temp->parent;
 			else //if there is no right parent it means that the iterator was at min and gets set to _rend
@@ -236,13 +236,15 @@ public:
 		//otherwise go to first right parent
 		else 
 		{
-			while (temp->parent && temp == temp->rc)
-				temp = temp->rc;
+			while (temp->parent && temp == temp->parent->rc)
+				temp = temp->parent;
 			if (temp->parent)
 				temp = temp->parent;
 			//if there is no right parent it means that the iterator was at max and gets set to _end
 			else
+			{
 				temp = this->_end;
+			}
 		}
 		this->_current = temp;
 		return (*this);
@@ -260,7 +262,10 @@ public:
 		T *temp = this->_current;
 		//if iterator is at _end, go to max
 		if (temp == this->_end)
+		{
+			std::cerr << "hi" << std::endl;
 			temp = this->_end->parent;
+		}
 		//if left child exist, find maximum of left tree
 		else if (temp->lc)
 		{
@@ -271,8 +276,8 @@ public:
 		//otherwise go to first left parent
 		else 
 		{
-			while (temp->parent && temp == temp->lc)
-				temp = temp->lc;
+			while (temp->parent && temp == temp->parent->lc)
+				temp = temp->parent;
 			if (temp->parent)
 				temp = temp->parent;
 			else //if there is no right parent it means that the iterator was at min and gets set to _rend

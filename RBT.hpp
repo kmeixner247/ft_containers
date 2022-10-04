@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 19:27:23 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/04 20:08:22 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,9 +290,9 @@ public:
 			}
 		}
 		if (this->_compare(get_key(this->_rend->parent->content), get_key(org->content)))
-			this->_rend->parent = org;
-		if (this->_compare(get_key(org->content), get_key(this->_end->parent->content)))
 			this->_end->parent = org;
+		if (this->_compare(get_key(org->content), get_key(this->_end->parent->content)))
+			this->_rend->parent = org;
 		return (org);
 	}
 

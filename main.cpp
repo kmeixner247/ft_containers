@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 19:02:21 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/04 20:08:06 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -401,25 +401,25 @@ mp2.insert(ft::make_pair(1,1));
 mp2.insert(ft::make_pair(2,1));
 mp2.insert(ft::make_pair(3,1));
 ft::map<int, int>::const_iterator it = mp1.begin();
-// std::cout << it->first << std::endl;
-// mp1.printBT();
+std::cout << "1: " << it->first << std::endl;
+mp1.printBT();
 
-// it++;
-// std::cout << it->first << std::endl;
-// it++;
-// std::cout << it->first << std::endl;
-// it++;
-// std::cout << it->first << std::endl;
-// it--;
-// std::cout << it->first << std::endl;
-// it--;
-// std::cout << it->first << std::endl;
-// it--;
-// std::cout << it->first << std::endl;
-// it--;
-// std::cout << it->first << std::endl;
-// it++;
-// std::cout << it->first << std::endl;
+it++;
+std::cout << "2: " << it->first << std::endl;
+it++;
+std::cout << "3: " << it->first << std::endl;
+it++;
+std::cout << "end: " << it->first << std::endl;
+it--;
+std::cout << "3: " << it->first << std::endl;
+it--;
+std::cout << "2: " << it->first << std::endl;
+it--;
+std::cout << "1: " << it->first << std::endl;
+it--;
+std::cout << "rend: " << it->first << std::endl;
+it++;
+std::cout << "1: " << it->first << std::endl;
 
 
 // std::cerr<< std::boolalpha << (mp1.end() == mp2.end()) << std::endl;
