@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 14:47:11 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/05 08:10:48 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 21:39:14 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,7 @@ void erase (iterator first, iterator last)
 
 void swap (set& x)
 {
-	set temp = *this;
-	*this = x;
-	x = temp;
+	this->_tree.swap(x._tree);
 }
 void clear()
 {

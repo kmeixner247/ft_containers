@@ -6,7 +6,7 @@
 #    By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 10:09:08 by kmeixner          #+#    #+#              #
-#    Updated: 2022/10/02 20:23:43 by kmeixner         ###   ########.fr        #
+#    Updated: 2022/10/05 23:27:35 by kmeixner         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,12 +18,22 @@ CC			=	c++
 
 RM			=	rm
 
-CFLAGS		=	-Wall -Wextra -std=c++98 -g -fsanitize=address #-O3
+CFLAGS		=	-Wall -Wextra -Werror -std=c++98 -g
 
-all:		$(NAME)
+all:		
+	sh run.sh
 
-$(NAME):	$(SRCS)
-			$(CC) $(CFLAGS) -o $(NAME) $(SRCS)
+vector:
+	$(CC) $(CFLAGS) -o $(NAME) ./tests/vector_tests.cpp && leaks --atExit -- ./$(NAME)
+
+map:
+	$(CC) $(CFLAGS) -o $(NAME) ./tests/map_tests.cpp && leaks --atExit -- ./$(NAME)
+
+stack:
+	$(CC) $(CFLAGS) -o $(NAME) ./tests/stack_tests.cpp && leaks --atExit -- ./$(NAME)
+	
+set:
+	$(CC) $(CFLAGS) -o $(NAME) ./tests/set_tests.cpp && leaks --atExit -- ./$(NAME)
 
 clean:		
 			$(RM) -f $(NAME)
@@ -32,4 +42,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re
+.PHONY:		all clean fclean re vector map stack set

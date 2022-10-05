@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/05 09:01:52 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 20:48:19 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,11 @@ public:
 	size_type size() const
 	{
 		return (this->_size);
+	}
+	
+	size_type max_size() const
+	{
+		return (this->_allocator.max_size());
 	}
 
 	template<typename Key>
@@ -620,6 +625,30 @@ public:
 		this->_allocator.construct(node->content, *(child->content));
 		delete_node(child);
 		return (node);
+	}
+
+	void swap(RBT &x)
+	{
+		node_pointer troot = this->_root;
+		node_pointer tend = this->_end;
+		node_pointer trend = this->_rend;
+		allocator_type talloc = this->_allocator;
+		key_compare tcomp = this->_compare;
+		size_type tsize = this->_size;
+
+		this->_root = x._root;
+		this->_end = x._end;
+		this->_rend = x._rend;
+		this->_allocator = x._allocator;
+		this->_compare = x._compare;
+		this->_size = x._size;
+		
+		x._root = troot;
+		x._end = tend;
+		x._rend = trend;
+		x._allocator = talloc;
+		x._compare = tcomp;
+		x._size = tsize;
 	}
 
 	void clear()

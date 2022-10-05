@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:28:49 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/02 13:16:06 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 11:13:51 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -442,6 +442,12 @@ public:
 		this->_end = this->_start;
 	}
 	
+	// get_allocator
+	allocator_type get_allocator() const
+	{
+		return (this->_allocator);
+	}
+
 private:
 	pointer			_start;
 	pointer 		_end;

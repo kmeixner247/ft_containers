@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/05 08:03:43 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 20:34:16 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ public:
 
 	size_type max_size() const
 	{
-		return (this->_allocator.max_size());
+		return (this->_tree.max_size());
 	}
 
 	/*	
@@ -177,14 +177,18 @@ public:
 
 	mapped_type& at (const key_type& k)
 	{
-		return ((*find(k)).second);
-		// return (mapped_type());
+		iterator temp = find(k);
+		if (temp == this->end())
+			throw std::out_of_range("index out of range");
+		return ((*temp).second);
 	}
 	
 	const mapped_type& at (const key_type& k) const
 	{
-		return ((*find(k)).second);
-		// return (mapped_type());
+		const_iterator temp = find(k);
+		if (temp == this->end())
+			throw std::out_of_range("index out of range");
+		return ((*temp).second);
 	}
 	
 	/*	
@@ -233,9 +237,10 @@ public:
 
 	void swap (map& x)
 	{
-		map temp = *this;
-		*this = x;
-		x = temp;
+		// map temp = *this;
+		// *this = x;
+		// x = temp;
+		this->_tree.swap(x._tree);
 	}
 
 	void clear()
