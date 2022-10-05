@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/23 11:58:44 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 20:08:06 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 00:00:48 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,34 +392,35 @@ t_timeval start;
 	// while (it != mp.end())
 	// 	std::cerr << it++ << std::endl;
 }
-ft::map<int, int> mp1;
-ft::map<int, int> mp2;
-mp1.insert(ft::make_pair(1,1));
-mp1.insert(ft::make_pair(2,1));
-mp1.insert(ft::make_pair(3,1));
-mp2.insert(ft::make_pair(1,1));
-mp2.insert(ft::make_pair(2,1));
-mp2.insert(ft::make_pair(3,1));
-ft::map<int, int>::const_iterator it = mp1.begin();
-std::cout << "1: " << it->first << std::endl;
-mp1.printBT();
+// ft::map<int, int> mp1;
+// ft::map<int, int> mp2;
+// mp1.insert(ft::make_pair(1,1));
+// mp1.insert(ft::make_pair(2,1));
+// mp1.insert(ft::make_pair(3,1));
+// mp2.insert(ft::make_pair(1,1));
+// mp2.insert(ft::make_pair(2,1));
+// mp2.insert(ft::make_pair(3,1));
+// ft::map<int, int>::const_iterator it = mp1.begin();
+// std::cout << "1: " << it->first << std::endl;
+// mp1.printBT();
 
-it++;
-std::cout << "2: " << it->first << std::endl;
-it++;
-std::cout << "3: " << it->first << std::endl;
-it++;
-std::cout << "end: " << it->first << std::endl;
-it--;
-std::cout << "3: " << it->first << std::endl;
-it--;
-std::cout << "2: " << it->first << std::endl;
-it--;
-std::cout << "1: " << it->first << std::endl;
-it--;
-std::cout << "rend: " << it->first << std::endl;
-it++;
-std::cout << "1: " << it->first << std::endl;
+// it++;
+// std::cout << "2: " << it->first << std::endl;
+// it++;
+// std::cout << "3: " << it->first << std::endl;
+// it++;
+// std::cout << "end: " << it->first << std::endl;
+// it--;
+// it == --mp1.end();
+// std::cout << "3: " << it->first << std::endl;
+// it--;
+// std::cout << "2: " << it->first << std::endl;
+// it--;
+// std::cout << "1: " << it->first << std::endl;
+// it--;
+// std::cout << "rend: " << it->first << std::endl;
+// it++;
+// std::cout << "1: " << it->first << std::endl;
 
 
 // std::cerr<< std::boolalpha << (mp1.end() == mp2.end()) << std::endl;
@@ -475,6 +476,101 @@ std::cout << "1: " << it->first << std::endl;
 //     }
 // }
 // compare_print_vectors(v1, v2);
+
+// {
+//     std::map<int, int> mp;
+//     std::map<int, int> mpp;
+//     fillMap(mpp);
+//     for (std::map<int, int>::iterator it = mpp.begin(); it != mpp.end(); it++) { v1.push_back(it->first); }
+//     for (std::map<int, int>::iterator it = --mpp.end(); it != mpp.begin(); it--) { v1.push_back(it->first); }
+//     std::map<int, int> mp0;
+//     std::map<int, int>::iterator ii = mp0.insert(std::make_pair(3, 3)).first;
+//     ii++;
+//     v1.push_back((--ii)->first);
+//     for (int i = 0, j = 10; i < 5; ++i, ++j)
+//         mp.insert(std::make_pair(i, j));
+//     std::map<int, int>::iterator it = mp.begin();
+//     std::map<int, int>::iterator it2 = mp.end();
+//     v1.push_back(it->first);
+//     it++;
+//     it++;
+//     it++;
+//     it++;
+//     v1.push_back(it->first);
+//     it++;
+//     it--;
+//     v1.push_back(it->first);
+//     it2--;
+//     v1.push_back(it2->first);
+//     v1.push_back(it2 == it);
+//     v1.push_back((--it2)->first);
+//     v1.push_back((it2--)->first);
+//     v1.push_back((it2++)->first);
+//     v1.push_back((++it2)->first);
+// }
+
+// {
+//     _map<int, int> mp;
+//     _map<int, int> mpp;
+//     fillMap(mpp);
+//     for (_map<int, int>::iterator it = mpp.begin(); it != mpp.end(); it++) { v2.push_back(it->first); }
+//     for (_map<int, int>::iterator it = --mpp.end(); it != mpp.begin(); it--) { v2.push_back(it->first); }
+//     _map<int, int> mp0;
+//     _map<int, int>::iterator ii = mp0.insert(_make_pair(3, 3)).first;
+//     ii++;
+//     v2.push_back((--ii)->first);
+//     for (int i = 0, j = 10; i < 5; ++i, ++j)
+//         mp.insert(_make_pair(i, j));
+//     _map<int, int>::iterator it = mp.begin();
+//     _map<int, int>::iterator it2 = mp.end();
+//     v2.push_back(it->first);
+//     it++;
+//     it++;
+//     it++;
+//     it++;
+//     v2.push_back(it->first);
+//     it++;
+//     it--;
+//     v2.push_back(it->first);
+//     it2--;
+//     v2.push_back(it2->first);
+//     v2.push_back(it2 == it);
+//     v2.push_back((--it2)->first);
+//     v2.push_back((it2--)->first);
+//     v2.push_back((it2++)->first);
+//     v2.push_back((++it2)->first);
+// }
+std::vector<int> v1;
+std::vector<int> v2;
+
+ft::map<int, std::string> mp;
+mp.insert(ft::make_pair(0, "AAAAAAAAAA"));
+mp.insert(ft::make_pair(1, "BBBBBBBBB"));
+mp.insert(ft::make_pair(2, "CCCCCCCC"));
+mp.insert(ft::make_pair(3, "DDDDDDD"));
+mp.insert(ft::make_pair(4, "EEEEEE"));
+mp.insert(ft::make_pair(5, "FFFFF"));
+mp.insert(ft::make_pair(6, "GGGG"));
+mp.insert(ft::make_pair(7, "HHH"));
+mp.insert(ft::make_pair(8, "II"));
+mp.insert(ft::make_pair(9, "J"));
+std::cout << mp.size() << std::endl;
+mp.erase(++mp.begin());
+mp.erase(mp.begin());
+mp.erase(--mp.end());
+mp.erase(mp.begin(), ++(++(++mp.begin())));
+mp.erase(--(--(--mp.end())), --mp.end());
+mp[10] = "hyo";
+mp[11] = "hya";
+mp.printBT();
+std::cout << (--(--(--mp.end())))->first << std::endl;
+mp.erase(--(--(--mp.end())), mp.end());
+mp.printBT();
+mp[12] = "ONE";
+std::cout << mp.size() << std::endl;
+
+// compare_print_vectors(v1, v2);
+
 }
 // 	     RBT_iterator<      pair<const int, int>, RBT<pair<const int, int>, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > > >
 // constant_RBT_iterator<const pair<const int, int>, RBT<pair<const int, int>, std::__1::less<int>, std::__1::allocator<ft::pair<const int, int> > > >

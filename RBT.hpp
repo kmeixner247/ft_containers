@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 20:08:22 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 09:01:52 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ public:
 		this->_allocator = alloc;
 		this->create_ends();
 		this->_root = this->_end;
+		this->_size = 0;
 	}
 
 	void create_ends()
@@ -96,7 +97,6 @@ public:
 	
 	~RBT()
 	{
-		// this->clear();
 	}
 	
 	RBT &operator=(const RBT &rhs)
@@ -104,10 +104,9 @@ public:
 		this->clear();
 		this->_compare = rhs.getCompare();
 		this->_allocator = rhs._allocator;
+		this->_size = rhs._size;
 		if (rhs.getRoot() != rhs.getEnd())
 		{
-			// this->_root = this->_end;
-		// else
 			this->_root = this->_nodealloc.allocate(1);
 			this->_root->parent = NULL;
 			this->_root->lc = NULL;
@@ -117,6 +116,8 @@ public:
 			this->_allocator.construct(this->_root->content, *(rhs.getRoot()->content));
 			this->copy_rec(this->_root, rhs.getRoot());
 		}
+		this->_end->parent = this->maximum(this->_root);
+		this->_rend->parent = this->minimum(this->_root);
 		return (*this);
 	}
 
@@ -125,21 +126,26 @@ public:
 		return (this->_compare);
 	}
 	
+	allocator_type getAlloc() const
+	{
+		return (this->_allocator);
+	}
+
 	node_pointer getEnd() const
 	{
 		return (this->_end);
 	}
-	
+
 	node_pointer getRend() const
 	{
 		return (this->_rend);
 	}
-	
+
 	node_pointer getRoot() const
 	{
 		return (this->_root);
 	}
-	
+
 	void copy_rec(node_pointer node, node_pointer rhsnode)
 	{
 		if (rhsnode->lc)
@@ -168,11 +174,7 @@ public:
 	
 	size_type size() const
 	{
-		size_type count = 0;
-		if (this->_root == this->_end)
-			return (0);
-		size_rec(this->_root, &count);
-		return (count);
+		return (this->_size);
 	}
 
 	template<typename Key>
@@ -230,9 +232,10 @@ public:
 
 	node_pointer insert(value_type val)
 	{
-		node_pointer temp123 = find_node(val);
-		if (temp123 != this->_end)
-			return (temp123);
+		node_pointer temp = find_node(val);
+		if (temp != this->_end)
+			return (temp);
+		this->_size++;
 		node_pointer newnode = this->_nodealloc.allocate(1);
 		node_pointer org = newnode;
 		newnode->content = this->_allocator.allocate(1);
@@ -289,10 +292,8 @@ public:
 				}
 			}
 		}
-		if (this->_compare(get_key(this->_rend->parent->content), get_key(org->content)))
-			this->_end->parent = org;
-		if (this->_compare(get_key(org->content), get_key(this->_end->parent->content)))
-			this->_rend->parent = org;
+		this->_end->parent = this->maximum(this->_root);
+		this->_rend->parent = this->minimum(this->_root);
 		return (org);
 	}
 
@@ -317,28 +318,14 @@ public:
 		}
 		return (temp);
 	}
-	// node_pointer successor(node_pointer node) const
-	// {
-	// 	if (node == this->maximum(this->_root))
-	// 		return (this->_end);
-	// 	if (node->rc)
-	// 		return (minimum(node->rc));
-	// 	node_pointer temp = node->parent;
-	// 	while (temp && node == temp->rc)
-	// 	{
-	// 		node = temp;
-	// 		temp = temp->parent;
-	// 	}
-	// 	return (temp);
-	// }
 
-	const_node_pointer successor(const_node_pointer node) const
+	node_pointer successor(node_pointer node) const
 	{
 		if (node == this->maximum(this->_root))
 			return ((this->_end));
 		if (node->rc)
 			return ((minimum(node->rc)));
-		const_node_pointer temp = node->parent;
+		node_pointer temp = node->parent;
 		while (temp && node == temp->rc)
 		{
 			node = temp;
@@ -347,8 +334,6 @@ public:
 		return ((temp));
 	}
 
-	
-	//CONSTANT VERISONS
 	node_pointer predecessor(node_pointer node)
 	{
 		if (node == this->_end)
@@ -378,21 +363,6 @@ public:
 		return (temp);
 	}
 
-	// const_node_pointer predecessor(node_pointer node) const
-	// {
-	// 	if (node == this->_end)
-	// 		return (reinterpret_cast<const_node_pointer>(this->maximum(this->_root)));
-	// 	if (node->lc)
-	// 		return (reinterpret_cast<const_node_pointer>(maximum(node->lc)));
-	// 	node_pointer temp = node->parent;
-	// 	while (temp && node == temp->lc)
-	// 	{
-	// 		node = temp;
-	// 		temp = temp->parent;
-	// 	}
-	// 	return (reinterpret_cast<const_node_pointer>(temp));
-	// }
-
 	node_pointer minimum(node_pointer node)
 	{
 		node_pointer temp;
@@ -414,16 +384,6 @@ public:
 		return (temp);
 	}
 
-	// const_node_pointer minimum(node_pointer node) const
-	// {
-	// 	node_pointer temp = node;
-	// 	if (!_root)
-	// 		return (reinterpret_cast<const_node_pointer>(this->_end));
-	// 	while (temp->lc)
-	// 		temp = temp->lc;
-	// 	return (reinterpret_cast<const_node_pointer>(temp));
-	// }
-
 	node_pointer maximum(node_pointer node) const
 	{
 		node_pointer temp;
@@ -434,15 +394,6 @@ public:
 			temp = temp->rc;
 		return (temp);
 	}
-	// const_node_pointer maximum(node_pointer node) const
-	// {
-	// 	const_node_pointer temp = node;
-	// 	if (!_root)
-	// 		return (this->_end);
-	// 	while (temp->rc)
-	// 		temp = temp->rc;
-	// 	return (reinterpret_cast<const_node_pointer>(temp));
-	// }
 
 	iterator begin()
 	{
@@ -476,8 +427,15 @@ public:
 	void erase(iterator position)
 	{
 		node_pointer node = position->getNodeptr();
-		if (node == this->end())
+		if (node == this->_end || node == this->_rend)
 			return ;
+		node_pointer temp;
+		temp = this->maximum(this->_root);
+		if (node == temp)
+			this->_end->parent = this->predecessor(temp);
+		temp = this->minimum(this->_root);
+		if (node == temp)
+			this->_rend->parent = this->successor(temp);
 		this->erase(node);
 	}
 
@@ -485,30 +443,44 @@ public:
 	size_type erase (Key &k)
 	{
 		node_pointer node = this->find_node<Key>(k);
-		if (node != this->_end)
-		{
-			this->erase(node);
-			return (1);
-		}
+		if (node == this->_end || node == this->_rend)
 			return (0);
+		node_pointer temp;
+		temp = this->maximum(this->_root);
+		if (node == temp)
+			this->_end->parent = this->predecessor(temp);
+		temp = this->minimum(this->_root);
+		if (node == temp)
+			this->_rend->parent = this->successor(temp);
+		this->erase(node);
+		return (1);
 	}
 
 	void erase(value_type &val)
 	{
 		node_pointer node = this->find_node(val);
-		if (node != this->_end)
-			this->erase(node);
+		if (node == this->_end || node == this->_rend)
+			return ;
+		node_pointer temp;
+		temp = this->maximum(this->_root);
+		if (node == temp)
+			this->_end->parent = this->predecessor(temp);
+		temp = this->minimum(this->_root);
+		if (node == temp)
+			this->_rend->parent = this->successor(temp);
+		this->erase(node);
 	}
 
 	void erase(node_pointer node)
 	{
-		// if (this->size() == 1)
 		if (!this->_root->lc && !this->_root->rc && this->_root != this->_end)
 		{
 			delete_node(this->_root);
 			this->_root = this->_end;
+			this->_size--;
 			return ;
 		}
+		this->_size--;
 		node_pointer movedupnode;
 		bool deletednodecolour;
 		if (!node->lc || !node->rc)
@@ -541,7 +513,10 @@ public:
 	void fixTreeErase(node_pointer node)
 	{
 		if (node == this->_root)
+		{
+			node->colour = BLACK;	
 			return ;
+		}
 		node_pointer sibling = node->parent->lc;
 		if (sibling == node)
 			sibling = node->parent->rc;
@@ -651,6 +626,7 @@ public:
 	{
 		this->clear_subtree(this->_root);
 		this->_root = this->_end;
+		this->_size = 0;
 	}
 
 	void deleteEnds()
@@ -669,15 +645,7 @@ private:
 	allocator_type _allocator;
 	key_compare _compare;
 	std::allocator<Node<T> > _nodealloc;
-
-	void size_rec(node_pointer node, size_type *count) const
-	{
-		(*count)++;
-		if (node->lc)
-			size_rec(node->lc, count);
-		if (node->rc)
-			size_rec(node->rc, count);
-	}
+	size_type _size;
 
 	void clear_subtree(node_pointer node)
 	{
@@ -734,10 +702,6 @@ private:
 
 	void swap_nodes(node_pointer node, node_pointer other)
 	{
-		// pointer temp = node->content;
-		// node->content = other->content;
-		// other->content = temp;
-
 		this->_allocator.destroy(node->content);
 		this->_allocator.construct(node->content, *(other->content));
 	}
@@ -747,7 +711,6 @@ private:
 		node_pointer current = this->_root;
 		while (current)
 		{
-			// if (node->content < current->content)
 			if (this->_compare(get_key(node->content), get_key(current->content)))
 			{
 				if (current->lc)

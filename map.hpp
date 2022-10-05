@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 19:26:53 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 08:03:43 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,23 +128,23 @@ public:
 	reverse_iterator rbegin()
 	{
 		reverse_iterator temp(this->end());
-		return (--temp);
+		return (temp);
 	}
 	
 	const_reverse_iterator rbegin() const
 	{
 		const_reverse_iterator temp(this->end());
-		return (--temp);
+		return (temp);
 	}
 	
 	reverse_iterator rend()
 	{
-		return (this->_tree.rend());
+		return (reverse_iterator(this->_tree.begin()));
 	}
 	
 	const_reverse_iterator rend() const
 	{
-		return (this->_tree.rend());
+		return (const_reverse_iterator(this->_tree.begin()));
 	}
 
 	/*	
@@ -172,7 +172,7 @@ public:
 
 	mapped_type& operator[] (const key_type& k)
 	{
-		 return((*((this->insert(ft::make_pair(k,mapped_type()))).first)).second);
+		return((*((this->insert(ft::make_pair(k,mapped_type()))).first)).second);
 	}
 
 	mapped_type& at (const key_type& k)
@@ -250,7 +250,11 @@ public:
 	{
 		return (this->_comp);
 	}
-
+	
+	value_compare value_comp() const
+	{
+		return (value_compare(this->_comp));
+	}
 	// value_compare value_comp() const
 	// {}
 
@@ -259,15 +263,15 @@ public:
 	*/
 	iterator find (const key_type& k)
 	{
-		return (iterator(this->_tree.template find_node<key_type>(k), &this->_tree));
+		return (iterator(this->_tree.template find_node<key_type>(k), this->_tree.getEnd(), this->_tree.getRend()));
 	}
 
 	const_iterator find (const key_type& k) const
 	{
-		return (const_iterator(this->_tree.template find_node<const key_type>(k), &this->_tree));
+		return (const_iterator(this->_tree.template find_node<const key_type>(k), this->_tree.getEnd(), this->_tree.getRend()));
 	}	
 
-	size_type count (const key_type& k)
+	size_type count (const key_type& k) const
 	{
 		if (this->find(k) == this->end())
 			return (0);
@@ -277,7 +281,6 @@ public:
 
 	iterator lower_bound (const key_type& k)
 	{
-		// (void)k;
 		iterator it = this->begin();
 		while (it != this->end() && this->_comp(it->first, k))
 			it++;
@@ -302,7 +305,7 @@ public:
 	
 	const_iterator upper_bound (const key_type& k) const
 	{
-		iterator it = this->begin();
+		const_iterator it = this->begin();
 		while (it != this->end() && !(this->_comp(k, it->first)))
 			it++;
 		return (it);
@@ -350,39 +353,39 @@ private:
 	RELATIONAL OPERATORS
 */
 template <class Key, class T, class Compare, class Alloc>
-bool operator== (  map<Key,T,Compare,Alloc>& lhs,  map<Key,T,Compare,Alloc>& rhs ) 
+bool operator== ( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 {
 	if (lhs.size() != rhs.size())
 		return (false);
-	return (ft::equal<typename ft::map<Key, T>::iterator, typename ft::map<Key, T>::iterator>(lhs.begin(), lhs.end(), rhs.begin()));
+	return (ft::equal<typename ft::map<Key, T>::const_iterator, typename ft::map<Key, T>::const_iterator>(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
 template <class Key, class T, class Compare, class Alloc>
-bool operator!= (  map<Key,T,Compare,Alloc>& lhs,  map<Key,T,Compare,Alloc>& rhs )
+bool operator!= ( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 {
 	return (!(lhs == rhs));
 }
 
 template <class Key, class T, class Compare, class Alloc>
-bool operator< (  map<Key,T,Compare,Alloc>& lhs,  map<Key,T,Compare,Alloc>& rhs )
+bool operator< ( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 {
-	return (ft::lexicographical_compare<typename ft::map<Key, T>::iterator, typename ft::map<Key, T>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	return (ft::lexicographical_compare<typename ft::map<Key, T>::const_iterator, typename ft::map<Key, T>::const_iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 }
 
 template <class Key, class T, class Compare, class Alloc>
-bool operator<= (  map<Key,T,Compare,Alloc>& lhs,  map<Key,T,Compare,Alloc>& rhs )
+bool operator<= ( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 {
 	return (!(rhs < lhs));
 }
 
 template <class Key, class T, class Compare, class Alloc>
-bool operator>  (  map<Key,T,Compare,Alloc>& lhs,  map<Key,T,Compare,Alloc>& rhs )
+bool operator>  ( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 {
 	return (rhs < lhs);
 }
 
 template <class Key, class T, class Compare, class Alloc>
-bool operator>= (  map<Key,T,Compare,Alloc>& lhs,  map<Key,T,Compare,Alloc>& rhs )
+bool operator>= ( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
 {
 	return (!(lhs < rhs));
 }

@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 14:47:11 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 16:56:58 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 08:10:48 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,23 +32,24 @@ typedef typename allocator_type::reference reference;
 typedef typename allocator_type::const_reference const_reference;
 typedef typename allocator_type::pointer pointer; 
 typedef typename allocator_type::const_pointer const_pointer;
-typedef typename ft::RBT_iterator<value_type, tree_type> iterator;
-typedef typename ft::constant_RBT_iterator<const value_type, tree_type> const_iterator;
+typedef typename ft::const_RBT_iterator<typename tree_type::node, tree_type> iterator;
+typedef typename ft::const_RBT_iterator<typename tree_type::node, tree_type> const_iterator;
 typedef typename ft::reverse_iterator<iterator> reverse_iterator;
 typedef typename ft::reverse_iterator<const_iterator> const_reverse_iterator;
 typedef ptrdiff_t difference_type;
 typedef size_t size_type;
 
+
 //constructors
 
 //Default / empty container constructor
-explicit set (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+explicit set (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp), _allocator(alloc)
 {
 }
 
 //Range constructor
 template <class InputIterator>
-set (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+set (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp), _allocator(alloc)
 {
 	this->insert(first, last);
 }
@@ -132,7 +133,7 @@ size_type max_size() const
 ft::pair<iterator,bool> insert (const value_type& val)
 {
 	bool booltemp = (this->_tree.find_node(val)) == this->_tree.getEnd();
-	iterator temp = iterator(this->_tree.insert(val), &this->_tree);
+	iterator temp = iterator(this->_tree.insert(val), this->_tree.getEnd(), this->_tree.getRend());
 	return (ft::make_pair<iterator, bool>(temp, booltemp));
 }
 
@@ -162,8 +163,9 @@ void erase (iterator first, iterator last)
 {
 	set<value_type> temp(first, last);
 	for (iterator it = temp.begin(); it != temp.end(); it++)
-		this->erase(it->first);
+		this->erase(it);
 }
+
 void swap (set& x)
 {
 	set temp = *this;
@@ -188,11 +190,11 @@ value_compare value_comp() const
 //operation stuff
 iterator find (const value_type& k)
 {
-	return (iterator(this->_tree.template find_node<key_type>(k), &this->_tree));
+	return (iterator(this->_tree.template find_node<key_type>(k), this->_tree.getEnd(), this->_tree.getRend()));
 }
 const_iterator find( const value_type& k ) const
 {
-		return (const_iterator(this->_tree.template find_node<const key_type>(k), &this->_tree));
+		return (const_iterator(this->_tree.template find_node<const key_type>(k), this->_tree.getEnd(), this->_tree.getRend()));
 }
 size_type count (const value_type& k) const
 {
@@ -201,10 +203,33 @@ size_type count (const value_type& k) const
 	else
 		return (1);
 }
+
+ft::pair<iterator,iterator> equal_range( const key_type& k )
+{
+	iterator it = this->find(k);
+	if (it != this->end())
+		return (ft::make_pair<iterator, iterator>(it, ++it));
+	it = this->begin();
+	while (it != this->end() && this->_comp(*it, k))
+		it++;
+	return (ft::make_pair<iterator, iterator>(it, it));
+}
+
+ft::pair<const_iterator,const_iterator> equal_range( const key_type& k ) const
+{
+	const_iterator it = this->find(k);
+	if (it != this->end())
+		return (ft::make_pair<const_iterator, const_iterator>(it, ++it));
+	it = this->begin();
+	while (it != this->end() && this->_comp(*it, k))
+		it++;
+	return (ft::make_pair<const_iterator, const_iterator>(it, it));
+}
+
 iterator lower_bound (const value_type& k)
 {
 	iterator it = this->begin();
-	while (it != this->end() && this->_comp(it->first, k))
+	while (it != this->end() && this->_comp(*it, k))
 		it++;
 	return (it);
 }
@@ -212,7 +237,7 @@ iterator lower_bound (const value_type& k)
 const_iterator lower_bound (const value_type& k) const
 {
 	const_iterator it = this->begin();
-	while (it != this->end() && this->_comp(it->first, k))
+	while (it != this->end() && this->_comp(*it, k))
 		it++;
 	return (it);
 }
@@ -220,15 +245,15 @@ const_iterator lower_bound (const value_type& k) const
 iterator upper_bound( const value_type& k )
 {
 	iterator it = this->begin();
-	while (it != this->end() && !(this->_comp(k, it->first)))
+	while (it != this->end() && !(this->_comp(k, *it)))
 		it++;
 	return (it);
 }
 
 const_iterator upper_bound( const value_type& k ) const
 {
-	iterator it = this->begin();
-	while (it != this->end() && !(this->_comp(k, it->first)))
+	const_iterator it = this->begin();
+	while (it != this->end() && !(this->_comp(k, *it)))
 		it++;
 	return (it);
 }
@@ -251,7 +276,7 @@ bool operator==( const ft::set<Key,Compare,Alloc>& lhs, const ft::set<Key,Compar
 {
 	if (lhs.size() != rhs.size())
 		return (false);
-	return (ft::equal<typename ft::set<Key>::iterator, typename ft::set<Key>::iterator>(lhs.begin(), lhs.end(), rhs.begin()));
+	return (ft::equal<typename ft::set<Key>::const_iterator, typename ft::set<Key>::const_iterator>(lhs.begin(), lhs.end(), rhs.begin()));
 }
 template< class Key, class Compare, class Alloc >
 bool operator!=( const ft::set<Key,Compare,Alloc>& lhs, const ft::set<Key,Compare,Alloc>& rhs )
@@ -262,7 +287,7 @@ bool operator!=( const ft::set<Key,Compare,Alloc>& lhs, const ft::set<Key,Compar
 template< class Key, class Compare, class Alloc >
 bool operator<( const ft::set<Key,Compare,Alloc>& lhs, const ft::set<Key,Compare,Alloc>& rhs )
 {
-	return (ft::lexicographical_compare<typename ft::set<Key>::iterator, typename ft::set<Key>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	return (ft::lexicographical_compare<typename ft::set<Key>::const_iterator, typename ft::set<Key>::const_iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 }
 
 template< class Key, class Compare, class Alloc >

@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 17:21:42 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/04 20:03:41 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 08:10:19 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ public:
 	RBT_iterator() : _current(0), _end(0), _rend(0) {}
 	RBT_iterator(T *p, T *end, T *rend) : _current(p), _end(end), _rend(rend) {}
 	RBT_iterator(const RBT_iterator &rhs) : _current(rhs._current), _end(rhs._end), _rend(rhs._rend) {}
+	template<typename OtherTree>
+	RBT_iterator(const RBT_iterator<T, OtherTree> &rhs) : _current(rhs.base()), _end(rhs.getEnd()), _rend(rhs.getRend()) {}
 
 	RBT_iterator &operator=(const RBT_iterator &rhs)
 	{
@@ -179,6 +181,11 @@ public:
 	{
 		*this = rhs;
 	}
+
+	template<typename OtherTree>
+	const_RBT_iterator(const RBT_iterator<T, OtherTree> &rhs) : _current(rhs.base()), _end(rhs.getEnd()), _rend(rhs.getRend()) {}
+	template<typename OtherTree>
+	const_RBT_iterator(const const_RBT_iterator<T, OtherTree> &rhs) : _current(rhs.base()), _end(rhs.getEnd()), _rend(rhs.getRend()) {}
 	const_RBT_iterator &operator=(const const_RBT_iterator &rhs)
 	{
 		this->_current = rhs._current;
@@ -263,7 +270,6 @@ public:
 		//if iterator is at _end, go to max
 		if (temp == this->_end)
 		{
-			std::cerr << "hi" << std::endl;
 			temp = this->_end->parent;
 		}
 		//if left child exist, find maximum of left tree
