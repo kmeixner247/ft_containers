@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:03:24 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/05 20:34:16 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 23:37:47 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,11 +57,6 @@ public:
 		}
 	};
 
-	void printBT()
-	{
-		this->_tree.printBT(this->_tree.getRoot());
-	}
-
 	//Default / empty container constructor
 	// explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : c(comp), mem_alloc(alloc)
 	explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp), _allocator(alloc)
@@ -103,25 +98,21 @@ public:
 	*/
 	iterator begin()
 	{
-		// return(iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
 		return (this->_tree.begin());
 	}
 
 	const_iterator begin() const
 	{
-		// return(const_iterator(this->_tree.minimum(this->_tree.getRoot()), &this->_tree));
 		return (this->_tree.begin());
 	}
 
 	iterator end()
 	{
-		// return(iterator(this->_tree.getEnd(), &this->_tree));
 		return (this->_tree.end());
 	}
 	
 	const_iterator end() const
 	{
-		// return(const_iterator(this->_tree.getEnd(), &this->_tree));
 		return (this->_tree.end());
 	}
 
@@ -237,9 +228,6 @@ public:
 
 	void swap (map& x)
 	{
-		// map temp = *this;
-		// *this = x;
-		// x = temp;
 		this->_tree.swap(x._tree);
 	}
 
@@ -260,8 +248,6 @@ public:
 	{
 		return (value_compare(this->_comp));
 	}
-	// value_compare value_comp() const
-	// {}
 
 	/*	
 		OPERATIONS MEMBER FUNCTIONS

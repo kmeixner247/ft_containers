@@ -6,7 +6,7 @@
 /*   By: kmeixner <konstantin.meixner@freenet.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 11:43:29 by kmeixner          #+#    #+#             */
-/*   Updated: 2022/10/05 20:48:19 by kmeixner         ###   ########.fr       */
+/*   Updated: 2022/10/05 23:37:02 by kmeixner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,13 +300,6 @@ public:
 		this->_end->parent = this->maximum(this->_root);
 		this->_rend->parent = this->minimum(this->_root);
 		return (org);
-	}
-
-	void printBT(const node_pointer node)
-	{
-		if (node == this->_end)
-			std::cout << "TREE IS EMPTY BRUV" << std::endl;
-		printBT("", node, false);
 	}
 
 	node_pointer successor(node_pointer node)
@@ -701,20 +694,6 @@ private:
 		this->_allocator.destroy(node->content);
 		this->_allocator.deallocate(node->content, 1);
 		this->_nodealloc.deallocate(node, 1);
-	}
-
-	void printBT(const std::string &prefix, const node_pointer node, bool isLeft)
-	{
-		if (node)
-		{
-			std::cout << prefix;
-			std::cout << (isLeft ? "├──" : "└──" );
-			std::cout << (node->colour == RED ? "\x1B[31m" : "");
-			std::cout << node->content->first << std::endl;
-			std::cout << (node->colour == RED ? "\033[0m" : "");
-        	printBT( prefix + (isLeft ? "│   " : "    "), node->lc, true);
-        	printBT( prefix + (isLeft ? "│   " : "    "), node->rc, false);
-		}
 	}
 
 	node_pointer find_node_to_delete(node_pointer node)
